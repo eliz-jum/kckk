@@ -90,7 +90,6 @@ GameObject:
   - 114: {fileID: 83298243}
   m_Layer: 2
   m_Name: robot
-  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
