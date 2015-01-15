@@ -24,7 +24,7 @@ using System.Collections.Generic;
 public class textScript : MonoBehaviour {
 	public InputField userInput;
 	public Text roboTalk;
-	public string output;
+	public string output = "Czekam na polecenia.";
 	private string commandText, roboText = "";
 	private int processState;
 	public List<string> wholeCommand = new List<string>();
@@ -35,12 +35,13 @@ public class textScript : MonoBehaviour {
 	public LayerMask myLayerMask;
 	
 	void OnSubmit(string line) {	
-		Debug.Log ("OnSubmit("+line+")");
+		//Debug.Log ("OnSubmit("+line+")");
 		commandText = DateTime.Now.ToString("h:mm:ss tt") +  "\nUzytkownik: \n   "+ line + "\n" ;
 		//		roboText = Parser (line);
+		output = line;
 		Parser (line);
 		stage_1 ();
-		output += commandText + "Robot:\n" + "   "+roboText;
+		//output += commandText + "Robot:\n" + "   "+roboText;
 	}
 	void Awake () { 
 		userInput = GameObject.Find ("userInput").GetComponent<InputField>();
@@ -106,7 +107,7 @@ public class textScript : MonoBehaviour {
 	}
 	void stage_1() {
 		Debug.Log ("jestem w stage_1");
-		Debug.Log(commandList[0]);
+//		Debug.Log("slowo 1 = "+commandList[0]);
 		if ( String.Equals(commandList[0], "go") ) {
 			go();
 		}
@@ -124,11 +125,66 @@ public class textScript : MonoBehaviour {
 		*/
 	}
 	void go() {
+		Debug.Log("jestem w go");
+		//Debug.Log(commandList [0]);
+		//Debug.Log(commandList [1]);
+		//Debug.Log(commandList [2]);
 		// jeśli podał kierunek
-		if ( String.Equals(commandList[1],"right") ) {
-			rigidbody2D.transform.position += new Vector3 (i, 0, 0) /* Time.deltaTime*/;
-			Debug.Log ("jestem w go");
+		int isDirection = 0;
+		//Debug.Log("sprawdzam up");
+		if ( String.Equals(commandList[0],"go")) {
+			if ( commandList.Count > 1 && String.Equals(commandList[1],"up") ) {
+				isDirection=1;
+				//Debug.Log("jestem w up");
+				if ( hitCollider("north")==false ) {//jesli nic nie stoi na przeszkodzie
+					//Debug.Log("czysto");
+					rigidbody2D.transform.position += new Vector3 (0, i, 0) /* Time.deltaTime*/;
+				}
+				else{
+					//Debug.Log("przesszkoda!");
+					Debug.Log( "You can't go in this direction. The "+(hitColliderName("north"))+" is there." );
+				}
+
+			}
+	///JESLI NIE PODA SIE KIERUNKU CZYLI SAMO "GO" ON SIE WYSYPUJE NA SPRAWDZANIU UP I KAPUT		CZEMU?????
+			//Debug.Log("sprawdzam down");
+			if ( commandList.Count > 1 && String.Equals(commandList[1],"down") ) {
+				isDirection=1;
+				if ( hitCollider("south")==false ) {
+					rigidbody2D.transform.position += new Vector3 (0, -i, 0);
+				}
+				else{
+					Debug.Log( "You can't go in this direction. The "+(hitColliderName("south"))+" is there." );
+				}
+			}
+			if ( commandList.Count > 1 && String.Equals(commandList[1],"right") ) {
+				isDirection=1;
+				if ( hitCollider("east")==false ) {
+					//Debug.Log("czysto");
+					rigidbody2D.transform.position += new Vector3 (i, 0, 0);
+				}
+				else{
+					Debug.Log( "You can't go in this direction. The "+(hitColliderName("east"))+" is there." );
+				}
+			}
+
+			if ( commandList.Count > 1 && String.Equals(commandList[1],"left") ) {
+				isDirection=1;
+				if ( hitCollider("west")==false ) {
+					rigidbody2D.transform.position += new Vector3 (-i, 0, 0);
+				}
+				else{
+					Debug.Log( "You can't go in this direction. The "+(hitColliderName("west"))+" is there." );
+				}
+			}
+
+
+			//jesli nie podal kierunku
+			if (isDirection==0){
+				Debug.Log("Nie podales kierunku!");
+			}
 		}
+
 	}
 
 		/*GDZIE BUDUJE
@@ -334,7 +390,7 @@ public class textScript : MonoBehaviour {
 			if (String.Equals(slowo, "okraglak"))
 				return true;
 		}
-		
+*/		
 
 		Vector2 translateDirection (string slowo) {
 			if (String.Equals(slowo, "north"))
@@ -343,25 +399,31 @@ public class textScript : MonoBehaviour {
 				return -Vector2.up;
 			if (String.Equals(slowo, "east"))
 				return Vector2.right;
-			if (String.Equals(slowo, "west"))
+			else //west
 				return -Vector2.right;
 		}
 		string hitColliderName (string direction) {
 			Vector2 vector = translateDirection(direction); 
-			RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, myLayerMask);	
-			//if (hit.collider != null) 
-			return hit.collider.gameObject.name;	
+			RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, i, myLayerMask);	
+			if (hit.collider != null) 
+					return hit.collider.gameObject.name;
+			else 
+					return "";
 		}
 		
 		bool hitCollider (string direction) {
 			Vector2 vector = translateDirection(direction); 
-			RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, myLayerMask);
-			if (hit.collider != null)
-				return 1;
-			else 
-				return 0;
+			RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, i, myLayerMask);
+			if (hit.collider != null) {
+				Debug.Log (hitColliderName(direction));
+				return true;
+			}
+			else {
+				Debug.Log ("W nic nie trafiłem ");
+					return false;
+			}
 		}
-
+/*
 		void destroyPrefab (string direction) {
 			Vector2 vector = translateDirection(direction); 
 			RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, myLayerMask);	

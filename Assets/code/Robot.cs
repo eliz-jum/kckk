@@ -18,7 +18,7 @@ public class Robot : MonoBehaviour {
 	}
 
 	void Update () {
-		if (String.Equals(textScriptInstantion.output,"up")) {
+		if (String.Equals(textScriptInstantion.output,"cos")) {
 			rigidbody2D.transform.position += new Vector3 (0, 0.8F, 0) * speed * Time.deltaTime;
 		}
 		//Debug.Log (textScriptInstantion.output);
