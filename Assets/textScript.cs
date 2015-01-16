@@ -24,7 +24,7 @@ using System.Collections.Generic;
 public class textScript : MonoBehaviour {
 	public InputField userInput;
 	public Text roboTalk;
-	public string output;
+	public string output = "Czekam na polecenia.";
 	private string commandText, roboText = "";
 	private int processState;
 	public List<string> wholeCommand = new List<string>();
@@ -35,13 +35,19 @@ public class textScript : MonoBehaviour {
 	public LayerMask myLayerMask;
 	public Transform parposition;
 	
-	void OnSubmit(string line) {	
+	void OnSubmit(string line) {
+		string commandLog;
 		//Debug.Log ("OnSubmit("+line+")");
 		commandText = DateTime.Now.ToString("h:mm:ss tt") +  "\nUzytkownik: \n   "+ line + "\n" ;
 		//		roboText = Parser (line);
-		Parser (line);
-		stage_1 ();
-		output += commandText + "Robot:\n" + "   "+roboText;
+		output = line;
+		commandLog = Parser (line);
+		if ( String.Equals(commandLog,"pusta") ) {
+			output = "Wpisałeś niepoprawną komendę.";
+		}	
+		else 
+			stage_1 ();
+		//output += commandText + "Robot:\n" + "   "+roboText;
 	}
 	void Awake () { 
 		userInput = GameObject.Find ("userInput").GetComponent<InputField>();
@@ -65,7 +71,7 @@ public class textScript : MonoBehaviour {
 		commands.Add("west",2);
 		commands.Add("?",0);
 	}
-	void Parser(string command) {
+	string Parser(string command) {
 		//JEŚLI ZNAK ZAPYTANA TO LOSUJ JEDNĄ Z ODPOWIEDZI ELSE PONIŻSZE
 		string[] words = command.Split(new Char [] {' ', ',', '.', ':', '\t', '?' }); // wyrzucić "?"
 		List<string> tempCommand = new List<string>();
@@ -92,9 +98,13 @@ public class textScript : MonoBehaviour {
 			}
 		} 
 		//ZAPYTAJ O DRUGIE SŁOWO JEŚLI NIE GO NIE MA
-		commandList.InsertRange(0,tempCommand); // wstawia na koniec
+		commandList.InsertRange(commandList.Count, tempCommand); // wstawia na koniec
 		//build house north
 		swap(commandList);
+		if (commandList.Count == 0)
+			return "pusta"; //lista pusta lub zła komenda
+		else
+			return "poprawna"; // command list zawiera jakieś poprawne słowa
 	}
 	void swap(List<string> list) { //uproszoczny swap
 		if ( (commandList.Count > 2) && (String.Equals(commands[commandList[1]],3)) 
@@ -146,45 +156,45 @@ public class textScript : MonoBehaviour {
 				Debug.Log( "You can't go in this direction. The "+(hitColliderName("north"))+" is there." );
 			}
 
-		}
-///JESLI NIE PODA SIE KIERUNKU CZYLI SAMO "GO" ON SIE WYSYPUJE NA SPRAWDZANIU UP I KAPUT		CZEMU?????
-		//Debug.Log("sprawdzam down");
-		if ( String.Equals(commandList[1],"down") ) {
-			isDirection=1;
-			if ( hitCollider("south")==false ) {
-				rigidbody2D.transform.position += new Vector3 (0, -i, 0);
 			}
-			else{
-				Debug.Log( "You can't go in this direction. The "+(hitColliderName("south"))+" is there." );
-			}
-		}
+	///JESLI NIE PODA SIE KIERUNKU CZYLI SAMO "GO" ON SIE WYSYPUJE NA SPRAWDZANIU UP I KAPUT		CZEMU?????
+			//Debug.Log("sprawdzam down");
+			if ( commandList.Count > 1 && String.Equals(commandList[1],"down") ) {
+				isDirection=1;
+				if ( hitCollider("south")==false ) {
+					rigidbody2D.transform.position += new Vector3 (0, -i, 0);
+				}
+				else{
+					output = "You can't go in this direction. The "+hitColliderName("south")+" is there." ;
+				}
 		if ( String.Equals(commandList[1],"right") ) {
-			isDirection=1;
-			if ( hitCollider("east")==false ) {
-				//Debug.Log("czysto");
-				rigidbody2D.transform.position += new Vector3 (i, 0, 0);
 			}
-			else{
-				Debug.Log( "You can't go in this direction. The "+(hitColliderName("east"))+" is there." );
+			if ( commandList.Count > 1 && String.Equals(commandList[1],"right") ) {
+				isDirection=1;
+				if ( hitCollider("east")==false ) {
+					//Debug.Log("czysto");
+					rigidbody2D.transform.position += new Vector3 (i, 0, 0);
+				}
+				else{
+					output = "You can't go in this direction. The "+hitColliderName("east")+" is there." ;
+				}
 			}
-		}
 
-		if ( String.Equals(commandList[1],"left") ) {
-			isDirection=1;
-			if ( hitCollider("west")==false ) {
-				rigidbody2D.transform.position += new Vector3 (-i, 0, 0);
+			if ( commandList.Count > 1 && String.Equals(commandList[1],"left") ) {
+				isDirection=1;
+				if ( hitCollider("west")==false ) {
+					rigidbody2D.transform.position += new Vector3 (-i, 0, 0);
+				}
+				else{
+					output = "You can't go in this direction. The "+hitColliderName("west")+" is there." ;
+				}
 			}
-			else{
-				Debug.Log( "You can't go in this direction. The "+(hitColliderName("west"))+" is there." );
+
+
+			//jesli nie podal kierunku
+			if (isDirection==0){
+				output = "Nie podales kierunku!";
 			}
-		}
-
-
-		//jesli nie podal kierunku
-		if (isDirection==0){
-			Debug.Log("Nie podales kierunku!");
-
-
 		}
 
 
@@ -403,7 +413,6 @@ public class textScript : MonoBehaviour {
 			else
 				return false;
 		}
-		
 
 		Vector2 translateDirection (string slowo) {
 			if (String.Equals(slowo, "north"))
@@ -419,7 +428,7 @@ public class textScript : MonoBehaviour {
 			Vector2 vector = translateDirection(direction); 
 			RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, i, myLayerMask);	
 			if (hit.collider != null) 
-				return hit.collider.gameObject.name;
+			return hit.collider.gameObject.name;	
 			else 
 				return "";//nie masz prawa!!! Wyrąbywać nullpointerów!!!!!!!!!
 		}
