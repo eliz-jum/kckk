@@ -7,7 +7,7 @@ public class add_prefab : MonoBehaviour {
 	void Start () {
 	
 	}
-	
+	/*
 	// Update is called once per frame
 	//private GameObject prefab = 
 	public Transform parposition;
@@ -25,6 +25,7 @@ public class add_prefab : MonoBehaviour {
 			Destroy(GameObject.Find("tree(Clone)"));
 		
 
-	
+
 	}
+	*/
 }

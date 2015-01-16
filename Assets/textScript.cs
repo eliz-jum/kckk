@@ -33,9 +33,10 @@ public class textScript : MonoBehaviour {
 	public float i = 0.8f;
 	public float x, y = 0;
 	public LayerMask myLayerMask;
+	public Transform parposition;
 	
 	void OnSubmit(string line) {	
-		Debug.Log ("OnSubmit("+line+")");
+		//Debug.Log ("OnSubmit("+line+")");
 		commandText = DateTime.Now.ToString("h:mm:ss tt") +  "\nUzytkownik: \n   "+ line + "\n" ;
 		//		roboText = Parser (line);
 		Parser (line);
@@ -106,29 +107,87 @@ public class textScript : MonoBehaviour {
 	}
 	void stage_1() {
 		Debug.Log ("jestem w stage_1");
-		Debug.Log(commandList[0]);
+		Debug.Log("slowo 1 = "+commandList[0]);
 		if ( String.Equals(commandList[0], "go") ) {
 			go();
 		}
 		/*
-		if ( String.Equals(commandList[0], "destroy") ){
-			destroy();
-		}
+
 		if commandList[0]==build{
 			stage_2();
 		}
-		
-		if commandList[0]==clear{
+		*/
+		if ( String.Equals(commandList[0], "destroy") ){
 			destroy();
 		}
-		*/
+		if ( String.Equals(commandList[0], "clear") ){
+			destroy();
+		}
+		if ( commandList.Count != 0 )
+			stage_1 ();
 	}
 	void go() {
+		Debug.Log("jestem w go");
+		//Debug.Log(commandList [0]);
+		//Debug.Log(commandList [1]);
+		//Debug.Log(commandList [2]);
 		// jeśli podał kierunek
-		if ( String.Equals(commandList[1],"right") ) {
-			rigidbody2D.transform.position += new Vector3 (i, 0, 0) /* Time.deltaTime*/;
-			Debug.Log ("jestem w go");
+		int isDirection = 0;
+		//Debug.Log("sprawdzam up");
+		if ( String.Equals(commandList[1],"up") ) {
+			isDirection=1;
+			//Debug.Log("jestem w up");
+			if ( hitCollider("north")==false ) {//jesli nic nie stoi na przeszkodzie
+				//Debug.Log("czysto");
+				rigidbody2D.transform.position += new Vector3 (0, i, 0) /* Time.deltaTime*/;
+			}
+			else{
+				//Debug.Log("przesszkoda!");
+				Debug.Log( "You can't go in this direction. The "+(hitColliderName("north"))+" is there." );
+			}
+
 		}
+///JESLI NIE PODA SIE KIERUNKU CZYLI SAMO "GO" ON SIE WYSYPUJE NA SPRAWDZANIU UP I KAPUT		CZEMU?????
+		//Debug.Log("sprawdzam down");
+		if ( String.Equals(commandList[1],"down") ) {
+			isDirection=1;
+			if ( hitCollider("south")==false ) {
+				rigidbody2D.transform.position += new Vector3 (0, -i, 0);
+			}
+			else{
+				Debug.Log( "You can't go in this direction. The "+(hitColliderName("south"))+" is there." );
+			}
+		}
+		if ( String.Equals(commandList[1],"right") ) {
+			isDirection=1;
+			if ( hitCollider("east")==false ) {
+				//Debug.Log("czysto");
+				rigidbody2D.transform.position += new Vector3 (i, 0, 0);
+			}
+			else{
+				Debug.Log( "You can't go in this direction. The "+(hitColliderName("east"))+" is there." );
+			}
+		}
+
+		if ( String.Equals(commandList[1],"left") ) {
+			isDirection=1;
+			if ( hitCollider("west")==false ) {
+				rigidbody2D.transform.position += new Vector3 (-i, 0, 0);
+			}
+			else{
+				Debug.Log( "You can't go in this direction. The "+(hitColliderName("west"))+" is there." );
+			}
+		}
+
+
+		//jesli nie podal kierunku
+		if (isDirection==0){
+			Debug.Log("Nie podales kierunku!");
+
+
+		}
+
+
 	}
 
 		/*GDZIE BUDUJE
@@ -294,6 +353,8 @@ public class textScript : MonoBehaviour {
 															wcisnij ja do listy jako commandList[1]
 															stage_3();
 		}
+
+*/
 		bool containsDirection(string slowo) {
 			if (String.Equals(slowo, "north"))
 				return true;
@@ -303,36 +364,44 @@ public class textScript : MonoBehaviour {
 				return true;
 			if (String.Equals(slowo, "west"))
 				return true;
+			else
+				return false;
 		}
 		bool containsBuilding(string slowo) {
-			if (String.Equals(slowo, "shed"))
+		if ( (String.Equals(slowo, "shed")) || (String.Equals(slowo, "shed(Clone)")) )
 				return true;
-			if (String.Equals(slowo, "house"))
+		    if ( (String.Equals(slowo, "house")) || (String.Equals(slowo, "house(Clone)")) )
 				return true;
-			if (String.Equals(slowo, "villa"))
+			if ( (String.Equals(slowo, "villa")) || (String.Equals(slowo, "villa(Clone)")) )
 				return true;
+			else
+				return false;
 		}
 		
 		bool containsRemains(string slowo) {
-			if (String.Equals(slowo, "trunks"))
+			if ( (String.Equals(slowo, "trunks")) || (String.Equals(slowo, "trunks(Clone)")) )
 				return true;
-			if (String.Equals(slowo, "ruins"))
+			if ( (String.Equals(slowo, "ruins")) || (String.Equals(slowo, "ruins(Clone)")) )
 				return true;
-			if (String.Equals(slowo, "ashes"))
+			if ( (String.Equals(slowo, "ashes")) || (String.Equals(slowo, "ashes(Clone)")) )
 				return true;
+			else
+				return false;
 		}
 
 		bool containsNietBud(string slowo) {
-			if (String.Equals(slowo, "opera"))
+			if ( (String.Equals(slowo, "opera")) || (String.Equals(slowo, "opera(Clone)")) )
 				return true;
-			if (String.Equals(slowo, "railway"))
+			if ( (String.Equals(slowo, "railway")) || (String.Equals(slowo, "railway(Clone)")) )
 				return true;
-			if (String.Equals(slowo, "fountain"))
+			if ( (String.Equals(slowo, "fountain")) || (String.Equals(slowo, "fountain(Clone)")) )
 				return true;
-			if (String.Equals(slowo, "castle"))
+			if ( (String.Equals(slowo, "castle")) || (String.Equals(slowo, "castle(Clone)")) )
 				return true;
-			if (String.Equals(slowo, "okraglak"))
+			if ( (String.Equals(slowo, "okraglak")) || (String.Equals(slowo, "okraglak(Clone)")) )
 				return true;
+			else
+				return false;
 		}
 		
 
@@ -343,23 +412,29 @@ public class textScript : MonoBehaviour {
 				return -Vector2.up;
 			if (String.Equals(slowo, "east"))
 				return Vector2.right;
-			if (String.Equals(slowo, "west"))
+			else //west
 				return -Vector2.right;
 		}
 		string hitColliderName (string direction) {
 			Vector2 vector = translateDirection(direction); 
-			RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, myLayerMask);	
-			//if (hit.collider != null) 
-			return hit.collider.gameObject.name;	
+			RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, i, myLayerMask);	
+			if (hit.collider != null) 
+				return hit.collider.gameObject.name;
+			else 
+				return "";//nie masz prawa!!! Wyrąbywać nullpointerów!!!!!!!!!
 		}
 		
 		bool hitCollider (string direction) {
 			Vector2 vector = translateDirection(direction); 
-			RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, myLayerMask);
-			if (hit.collider != null)
-				return 1;
-			else 
-				return 0;
+			RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, i, myLayerMask);
+			if (hit.collider != null) {
+				Debug.Log (hitColliderName(direction));
+				return true;
+			}
+			else {
+				Debug.Log ("W nic nie trafiłem ");
+					return false;
+			}
 		}
 
 		void destroyPrefab (string direction) {
@@ -371,82 +446,106 @@ public class textScript : MonoBehaviour {
 				Debug.Log ("raycast nie trafił, object = null");
 		}
 
-			void addPrefab(x, y, prefab_name){
-				Instantiate (Resources.Load (prefab_name), parposition.position + new Vector3 (x, y, 0), parposition.rotation);
+		void addPrefab(float x, float y, string prefab_name){
+			Instantiate (Resources.Load (prefab_name), parposition.position + new Vector3 (x, y, 0), parposition.rotation);
+		}
+
+		void matchRemains(string prefab_name, string direction){
+			if ( (String.Equals(prefab_name, "tree")) || (String.Equals(prefab_name, "tree(Clone)")) ){
+					destroyPrefab(direction);
+					addPrefab(x, y, "trunks");
+				}
+			if ( (String.Equals(prefab_name, "shed")) || (String.Equals(prefab_name, "shed(Clone)")) ){
+					destroyPrefab(direction);
+					addPrefab(x, y, "ashes");
 			}
+			else {
+				destroyPrefab(direction);
+				addPrefab(x, y, "ruins");
+			}
+		}
 
 		int destroy(){
+			x=0;
+			y=0;
 			// destroy north house
-			if containsDirection(commandList[1]) { // jeśli podał kierunek
-				x=0;
-				y=0;
-				if String.Equals(commandList[1],"north")
-					y=i;
-				if String.Equals(commandList[1],"south")
-					y=-i;
-				if String.Equals(commandList[1],"west")
-					x=-i;
-				if String.Equals(commandList[1],"east")
-					x=i;
-			}
+			if (containsDirection(commandList[1])) { // jeśli podał kierunek
 				
-				if containsBuilding(commandList[2]) || String.Equals(commandList[2],"tree") { //jesli podal budynek lub drzewo
-					if containsBuilding(hitColliderName(commandList[1])) || String.Equals(hitColliderName(commandList[1]),"Tree"){ //czy w kierunku ktory podal jest budynek/drzewo ktory podal
-						if String.Equals(commandList[2],"tree"){//tam jest drzewo
-							destroyPrefab(direction, "Tree"),
-							addPrefab(x, y, "trunks");
-						}
-						if String.Equals(commandList[2],"shed"){//ta jest szalas
-							destroyPrefab(commandList[1]); //usowa
-							addPrefab(x, y, "ashes");
-						}
-						else { //jest dom
-							destroyPrefab(commandList[1]); //usowa
-							addPrefab(x, y, "ruins");
-						}
+				if ( String.Equals(commandList[1],"north") )
+					y=i;
+				if ( String.Equals(commandList[1],"south") )
+					y=-i;
+				if ( String.Equals(commandList[1],"west") )
+					x=-i;
+				if ( String.Equals(commandList[1],"east") )
+					x=i;
+
+				
+				if ( (containsBuilding(commandList[2])) || (String.Equals(commandList[2],"tree")) ) { //jesli podal budynek lub drzewo
+					if ( (containsBuilding(hitColliderName(commandList[1]))) || (String.Equals(hitColliderName(commandList[1]),"tree")) ){//czy w kierunku ktory podal jest budynek/drzewo ktory podal
+
+						matchRemains( commandList[2], commandList[1]);
+						commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+						return 0;
 					}
 					else{ //w tym kierunku jest cos innego
 						// np na gorze jest home a on pisze "Destroy shed in the north."
-						"You can't destroy a "+commandList[2] //You can't destroy a shed
-						"In the "+commandList[1]+" there is a "+raycast(kierunek) //in the north there is a home.
-								commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+						Debug.Log ("You can't destroy the "+commandList[2]); //You can't destroy a shed
+						Debug.Log ("In the "+commandList[1]+" there is/are the "+hitColliderName(commandList[1]) ); //in the north there is a home.
+						commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
 						return 0;
 								
 								
 					}
 				}
-				//clear
-				if String.Equals(commandList[2],"trunks") || String.Equals(commandList[2],"ashes") ||  
-				String.Equals(commandList[2],"ruins") { //podal co wyczyscic
+				//jesli podal cokolwiek do clear
+				if ( containsRemains(commandList[2]) ) { //podal co wyczyscic
 					 
 					//hitColliderName dostaje kierunek zwraca nazwe collidera
 					//containsRemains porownuje slowo dostane z ruins/ashes/trunks
-					if (containsRemains(hitColliderName(commandList[1]))//czy w kierunku ktory podal jest pozostalosc ktora podal
-						destroyPrefab(directions, commandList[2]);
+					if (containsRemains(hitColliderName(commandList[1])) ){//czy w kierunku ktory podal jest pozostalosc ktora podal
+						destroyPrefab(commandList[1]);
+						commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+						return 0;
+					}
 					else {
-						"You can't clear "+commandList[2] 
-						"In the "+commandList[1]+" there are " + hitColliderName(commandList[1])
+						Debug.Log ("You can't clear "+commandList[2]); 
+						Debug.Log ("In the "+commandList[1]+" there is the " + hitColliderName(commandList[1]));
+						commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+						return 0;
 					}
 				}
 				
 				else { //jesli nie podal co usunac tylko kierunek
-					if !(hitCollider(commandsList[1])) {
-						"There is nothing to destroy."
+					if (String.Equals ((hitColliderName(commandList[1])), "grass")) {
+						Debug.Log("There is nothing to destroy.");
+						commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+						return 0;
 					}
-					if (containsNietBud(hitColliderName(commandList[1])){
-						"You mustn't destroy city's property!"
+					if (containsNietBud(hitColliderName(commandList[1])) ){
+						Debug.Log("You mustn't destroy city's property!");
+						commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+						return 0;
 					}
-
-					matchRemains(hitColliderName(commandList[1]),commandList[1]);
-
-					if containsRemains(hitColliderName(commandList[1])) //TO DO clear
+					if ( containsRemains(hitColliderName(commandList[1])) ){ //TO DO clear
 						destroyPrefab(commandList[1]);
+						commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+						return 0;
+					}
+					else{
+						matchRemains(hitColliderName(commandList[1]),commandList[1]);
+						commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+						return 0;
+					}
 				}
 				
 			}
 			else { //jesli nie bylo kierunku musial napisac co zniszczyc
-				if (containsNietBud(hitColliderName(commandList[1]))
-					"You mustn't destroy city's property!"
+				if (containsNietBud(hitColliderName(commandList[1])) ){
+					Debug.Log("You mustn't destroy city's property!");
+					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
+					return 0;
+				}
 				string N="";
 				string S="";
 				string E="";
@@ -454,74 +553,77 @@ public class textScript : MonoBehaviour {
 				x=0;
 				y=0; 
 
-			    RaycastHit2D up = Physics2D.Raycast (transform.position, vector, myLayerMask);
-				if hitCollider("north") && String.Equals(hitColliderName("north"),commandList[1]) { //jesli jest na polnocy to co chce skasowac
+			    
+				if ( hitCollider("north") && String.Equals(hitColliderName("north"),commandList[1]) ) { //jesli jest na polnocy to co chce skasowac
 					N="north";
 				}
-				if hitCollider("south") && String.Equals(hitColliderName("south"),commandList[1]) {
+				if ( hitCollider("south") && String.Equals(hitColliderName("south"),commandList[1]) ) {
 					S="south";
 				}
-				if hitCollider("east") && String.Equals(hitColliderName("east"),commandList[1]) {
+				if ( hitCollider("east") && String.Equals(hitColliderName("east"),commandList[1]) ) {
 					E="east";
 				}
-				if hitCollider("west") && String.Equals(hitColliderName("west"),commandList[1]) {
+				if ( hitCollider("west") && String.Equals(hitColliderName("west"),commandList[1]) ) {
 					W="west";
 				}
 				
-				if String.Equals(N,"") && String.Equals(E,"") && String.Equals(W,"") && String.Equals(S,""){ //nic nie jest prawdziwe
-					"There is nothing for u to destroy."
+				if ( String.Equals(N,"") && String.Equals(E,"") && String.Equals(W,"") && String.Equals(S,"") ){ //nic nie jest prawdziwe
+					Debug.Log ("The thing you are trying to destroy is not here.");
 				}
-				else if (N.Length + S.Length + W.Length + E.Length) < 6{ //tylko jedno prawdziwe
-					if String.Equals(N,"") {
-						y=i;											
-						matchRemains( commandList[1],"north" );
+				else if ( (N.Length + S.Length + W.Length + E.Length) < 6 ){ //tylko jedno prawdziwe
+					if ( String.Equals(N,"north") ) {//jesli cos jest na polnocy
+						y=i;
 						//clear
-						if containsRemains(commandList[1]) //sprawdza czy to pieńki/popioły/ruiny
+						if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
 							destroyPrefab("north");
+							commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
+							return 0;
+						}
+						else
+							matchRemains( commandList[1],"north" );
 					}
-					if S!=""{
+					if ( String.Equals(S,"south") ) {//jesli cos jest na polnocy
 						y=-i;
-						matchRemains( commandList[1],"south" );
 						//clear
-						if containsRemains(commandList[1]) //sprawdza czy to pieńki/popioły/ruiny
+						if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
 							destroyPrefab("south");
+							commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
+							return 0;
+						}
+						else
+							matchRemains( commandList[1],"south" );
 					}
-					if E!=""{
-						x=-i;
-						matchRemains( commandList[1],"east" );
-						//clear
-						if containsRemains(commandList[1]) //sprawdza czy to pieńki/popioły/ruiny
-							destroyPrefab("east");
-					}
-					if W!=""{
+					if ( String.Equals(E,"east") ) {//jesli cos jest na polnocy
 						x=i;
-						matchRemains( commandList[1],"west" );
 						//clear
-						if containsRemains(commandList[1]) //sprawdza czy to pieńki/popioły/ruiny
-							destroyPrefab("west");
+						if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
+							destroyPrefab("east");
+							commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
+							return 0;
+						}
+						else
+							matchRemains( commandList[1],"east" );
 					}
-					
-				}
+					if ( String.Equals(W,"west") ) {//jesli cos jest na polnocy
+						x=-i;
+						//clear
+						if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
+							destroyPrefab("west");
+							commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
+							return 0;
+						}
+						else
+							matchRemains( commandList[1],"west" );
+					}
 				else{ //jesli wiecej niz 1 jest prawdziwe
 					int oldLength = commmandList.Count;
-					"U can destroy a "+ commandList[1] +" in the "+N+S+E+W+". Which one do u choose?"
-				*/	/* *
-					 * z odpowiedzi uzytkownika tworzy czysta komende i dodaje ja na koncu commandList
-					 * destroy north / destroy north house po swapie
-					 * wiec tmpDirection to ostatni/przedostatni element listy
-					 * */
-		/*					string tmpDirection;
-					if containsDirection(commandList[commandList.Count -1])
-						tmpDirection = commandList[commandList.Count -1];
-					if commandList[commandList.Count -2]
-						tmpDirection = commandList[commandList.Count -2];
-					
-					matchRemains(commandList[1], tmpDirection);
-					if containRemains(commandList[1]) //TO DO clear
-						destroyPrefab(tmpDirection);
-					int newLength = commandList.Count;
-					commandList.RemoveRange(oldLength,newLength-oldLength); // usuwa odpowiedź użytkownika związaną z kierunkeim
-					commandList.RemoveRange(0,2); // usuwa pierwszą komendę
+					Debug.Log ("U can destroy a "+ commandList[1] +" in the "+N+" "+S+" "+E+" "+W+". Which one do u choose?");
+
+					 //z odpowiedzi uzytkownika tworzy czysta komende i wciska ja na 3 miejsce commandList
+					//potem wykonuje stage_1 od nowa posiadajac juz cala komende
+					//musi wiedziec ze to nie jest noemalna komenda ktora dostal tylko kierunek ktory ma wyjac i wcisnac do pierwszej
+
+					//
 				}
 				
 				
@@ -530,24 +632,10 @@ public class textScript : MonoBehaviour {
 			return 0;	
 		}
 		
-		
-		void matchRemains(string prefab_name, string direction){
-			if String.Equals(prefab_name, "tree"){
-				destroyPrefab(direction);
-				addPrefab(x, y, "trunks");
-			}
-			if String.Equals(prefab_name, "shed"{
-				destroyPrefab(direction);
-				addPrefab(x, y, "ashes");
-			}
-			else {
-				prefab_name = raycast(commandList[1])
-				destroyPrefab(direction);
-				addPrefab(x, y, "ruins");
-			}
-		}
 
-*/
+		
+
+
 }
 
 
