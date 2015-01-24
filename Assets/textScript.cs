@@ -41,10 +41,10 @@ public class textScript : MonoBehaviour {
 		//Debug.Log ("OnSubmit("+line+")");
 		commandText = DateTime.Now.ToString("h:mm:ss tt") +  "\nUzytkownik: \n "+ line;
 		//		roboText = Parser (line);
-		output += "\n"+line;
+		output += "\n[user]> "+line;
 		commandLog = Parser (line);
 		if ( String.Equals(commandLog,"pusta") ) {
-			output += "\nWpisałeś niepoprawną komendę.";
+			output += "\n[robot]> I don't understand you.";
 		}	
 		else 
 			stage_1 ();
@@ -100,15 +100,36 @@ public class textScript : MonoBehaviour {
 					//	tempCommand.Add (buildWord); // jeśli ostatnie słowo nie jest buildWord to dodaje buildWord przed word
 					tempCommand.Add (word);
 				}
-				if (String.Equals(commands[word],3) || String.Equals(commands[word],4)) {
+				if (String.Equals(commands[word],3))  {
 					tempCommand.Add (word);
 				}
+                //odpowiedź użytkownika na zadanie pytania 
+                if (specjalCommand) {
+                    //sprawdza czy podal kierunek do funkcji destroy
+                    if ( (String.Equals(commandList[0],"destroy") || (String.Equals(commandList[0],"clear"))) && containsDirection(word)) { 
+                        commandList.Insert(1,word); // wciska kierunek na commanList[1]
+                    }
+                    if (String.Equals(commandList[0],"build")) {
+                        ;
+                    }
+                }
 			}
 		} 
+   
 		//ZAPYTAJ O DRUGIE SŁOWO JEŚLI NIE GO NIE MA
-		commandList.InsertRange(commandList.Count, tempCommand); // wstawia na koniec
-		//build house north
-		swap(commandList);
+            //else if  //do build
+                //wyciagnij co (shed/house/villa)
+                //commandList: [0] build   [1]north   [2]villa
+                //wstaw do commadList[2] podnień
+                //commandList: [0] build   [1]villa
+                //stage_1();
+                
+      
+        if (!specjalCommand) {
+            swap(tempCommand);
+		    commandList.InsertRange(commandList.Count, tempCommand); // wstawia na koniec
+        }	
+        specjalCommand = false;
 		if (commandList.Count == 0)
 			return "pusta"; //lista pusta lub zła komenda
 		else
@@ -137,12 +158,12 @@ public class textScript : MonoBehaviour {
   		}
   		*/
         if ( commandList.Count > 0 && String.Equals(commandList[0], "destroy") ){
-  		    destroy();
-  		}
+  		    destroy();  
+        }
         if ( commandList.Count > 0 && String.Equals(commandList[0], "clear") ){
   			destroy();
   		}
-		if ( commandList.Count > 0 )
+		if ( !specjalCommand && commandList.Count > 0 )
 			stage_1 ();
 	}
 	int go() {
@@ -174,7 +195,7 @@ public class textScript : MonoBehaviour {
 					rigidbody2D.transform.position += new Vector3 (0, -i, 0);
 				}
 				else {
-					output += "\nYou can't go in this direction. The "+hitColliderName("south")+" is there." ;
+					output += "\n[robot]> You can't go in this direction. The "+hitColliderName("south")+" is there." ;
 				}
 			commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 			return 0;
@@ -186,7 +207,7 @@ public class textScript : MonoBehaviour {
 				rigidbody2D.transform.position += new Vector3 (i, 0, 0);
 			}
 			else {
-				output += "\nYou can't go in this direction. The "+hitColliderName("east")+" is there." ;
+				output += "\n[robot]> You can't go in this direction. The "+hitColliderName("east")+" is there." ;
 			}
 			commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 			return 0;
@@ -198,7 +219,7 @@ public class textScript : MonoBehaviour {
 				rigidbody2D.transform.position += new Vector3 (-i, 0, 0);
 			}
 			else{
-				output += "\nYou can't go in this direction. The "+hitColliderName("west")+" is there." ;
+				output += "\n[robot]> You can't go in this direction. The "+hitColliderName("west")+" is there." ;
 			}
 			commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 			return 0;
@@ -207,7 +228,7 @@ public class textScript : MonoBehaviour {
 
 		//jesli nie podal kierunku
 		if (isDirection==0) {
-			output += "\nYou didn't say where!";
+			output += "\n[robot]> You didn't say where!";
             commandList.RemoveRange(0,1);
             return 0;
 		}
@@ -240,7 +261,7 @@ public class textScript : MonoBehaviour {
 			else
 				if raycast == tree
 					"First You have to cut the tree"
-						"Do U want to do it now?"
+						"Do you want to do it now?"
 						if imput == "yes"
 							destroyPrefab( ?, tree); //usowa drzewao
 			addPrefab ( x, y, trunks) //pokazuje pienki
@@ -251,7 +272,7 @@ public class textScript : MonoBehaviour {
 			if  raycast == house/villa/shed
 				prefab_name = raycast
 					"First You have to distroy the"+prefab_name
-					"Do U want to do it now(yes/no)?"
+					"Do you want to do it now(yes/no)?"
 					if input == "yes"
 						destroyPrefab( direction ?, prefab name) //usowa ville / dom / szalas
 							if prefab_name == shed
@@ -266,7 +287,7 @@ public class textScript : MonoBehaviour {
 			if raycast == trunks || ruins || ashes
 				prefab_name = raycast
 					"U have to clear the "+prefab_name
-					"Do U want to do it now?"
+					"Do you want to do it now?"
 					if input == "yes"
 						destroyPrefab( direction ?, prefab_name) //usowa pienki / ruiny / popioly
 							stage_3(); //bo moze budowac
@@ -290,7 +311,7 @@ public class textScript : MonoBehaviour {
 	PROPONOWANIE KIERUNKOW
 	void offer_directions(){
 		if raycast(up)!= grass && (down) && (left) && (right) //jesli nigdzie nie moze budowac
-			"There is no ground u can build on. U have to either move or clear the area."
+			"There is no ground you can build on. you have to either move or clear the area."
 				
 				CZYSCI CALA LISTE/komendę
 				
@@ -305,7 +326,7 @@ public class textScript : MonoBehaviour {
 												" You can build in the east."
 													
 													
-													"Do u want to choose another direction?"
+													"Do you want to choose another direction?"
 													if input == no
 														BREAK ;
 		else
@@ -360,7 +381,7 @@ public class textScript : MonoBehaviour {
 		
 		void offer_house(){
 			"You don't have enough money"
-				"Do u want to build a cheaper house?"
+				"Do you want to build a cheaper house?"
 					if money >= house_money
 						"You can build a house or a shed."
 							else
@@ -475,17 +496,17 @@ public class textScript : MonoBehaviour {
 		if ( (String.Equals(prefab_name, "tree")) || (String.Equals(prefab_name, "tree(Clone)")) ){
 			destroyPrefab(direction);
 			addPrefab(x, y, "trunks");
-			output += "\nI've cut down the tree.";
+			output += "\n[robot]> I've cut down the tree.";
 		}
 		else if ( (String.Equals(prefab_name, "shed")) || (String.Equals(prefab_name, "shed(Clone)")) ){
 			destroyPrefab(direction);
 			addPrefab(x, y, "ashes");
-			output += "\nI've burned the shed.";
+			output += "\n[robot]> I've burned the shed.";
 		}
 		else {
 			destroyPrefab(direction);
 			addPrefab(x, y, "ruins");
-			output += "\nI've demolished the "+prefab_name;
+			output += "\n[robot]> I've demolished the "+prefab_name;
 		}
 	}
 
@@ -513,8 +534,8 @@ public class textScript : MonoBehaviour {
     			}
     			else { //w tym kierunku jest cos innego
     				// np na gorze jest home a on pisze "Destroy shed in the north."
-    				output += "\nYou can't destroy the "+commandList[2]; //You can't destroy a shed
-    				output += "\nIn the "+commandList[1]+" there is/are the "+hitColliderName(commandList[1]); //in the north there is a home.
+    				output += "\n[robot]> You can't destroy the "+commandList[2]; //You can't destroy a shed
+    				output += "\n[robot]> In the "+commandList[1]+" there is/are the "+hitColliderName(commandList[1]); //in the north there is a home.
     				commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
     				return 0;
     						
@@ -532,8 +553,8 @@ public class textScript : MonoBehaviour {
     				return 0;
     			}
     			else {
-    				output += "\nYou can't clear "+commandList[2]; 
-    				output += "\nIn the "+commandList[1]+" there is the " + hitColliderName(commandList[1]);
+    				output += "\n[robot]> You can't clear "+commandList[2]; 
+    				output += "\n[robot]> In the "+commandList[1]+" there is the " + hitColliderName(commandList[1]);
     				commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
     				return 0;
     			}
@@ -541,18 +562,18 @@ public class textScript : MonoBehaviour {
 			
 			else { //jesli nie podal co usunac tylko kierunek
 				if (String.Equals ((hitColliderName(commandList[1])), "grass")) {
-					output += "\nThere is nothing to destroy.";
+					output += "\n[robot]> There is nothing to destroy.";
 					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 					return 0;
 				}
 				if (containsNietBud(hitColliderName(commandList[1])) ){
-					output += "\nYou mustn't destroy city's property!";
+					output += "\n[robot]> You mustn't destroy city's property!";
 					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 					return 0;
 				}
 				if ( containsRemains(hitColliderName(commandList[1])) ){ //TO DO clear
 					destroyPrefab(commandList[1]);
-					output += "\nI've cleared what you'd wanted me to.";
+					output += "\n[robot]> I've cleared what you'd wanted me to.";
 					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 					return 0;
 				}
@@ -567,7 +588,7 @@ public class textScript : MonoBehaviour {
 		else { //jesli nie bylo kierunku musial napisac co zniszczyc
 
 			if (containsNietBud(commandList[1]) ){
-				output += "\nYou mustn't destroy city's property!";
+				output += "\n[robot]> You mustn't destroy city's property!";
 				commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 				return 0;
 			}
@@ -593,7 +614,7 @@ public class textScript : MonoBehaviour {
 			}
 			
 			if ( String.Equals(N,"") && String.Equals(E,"") && String.Equals(W,"") && String.Equals(S,"") ){ //nic nie jest prawdziwe
-				output += "\nThe thing you are trying to destroy is not here.";
+				output += "\n[robot]> The thing you are trying to destroy is not here.";
 				commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 				return 0;
 			}
@@ -603,7 +624,7 @@ public class textScript : MonoBehaviour {
 					//clear
 					if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
 						destroyPrefab("north");
-						output += "\nI've cleared "+commandList[1]+".";
+						output += "\n[robot]> I've cleared "+commandList[1]+".";
 						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 						return 0;
 					}
@@ -618,7 +639,7 @@ public class textScript : MonoBehaviour {
 					//clear
 					if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
 						destroyPrefab("south");
-						output += "\nI've cleared "+commandList[1]+".";
+						output += "\n[robot]> I've cleared "+commandList[1]+".";
 						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 						return 0;
 					}
@@ -633,7 +654,7 @@ public class textScript : MonoBehaviour {
 					//clear
 					if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
 						destroyPrefab("east");
-						output += "\nI've cleared "+commandList[1]+".";
+						output += "\n[robot]> I've cleared "+commandList[1]+".";
 						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 						return 0;
 					}
@@ -648,7 +669,7 @@ public class textScript : MonoBehaviour {
 					//clear
 					if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
 						destroyPrefab("west");
-						output += "\nI've cleared "+commandList[1]+".";
+						output += "\n[robot]> I've cleared "+commandList[1]+".";
 						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 						return 0;
 					}
@@ -661,38 +682,18 @@ public class textScript : MonoBehaviour {
             }
 			else { //jesli wiecej niz 1 jest prawdziwe
 					
-					output += "\nU can destroy a "+ commandList[1] +" in the "+N+" "+S+" "+E+" "+W+". Which one do u choose?";
-					
-
-					//specjalna komenda
-					specjalCommand = true;
-					return 0;
-
-				//specjalny parser
-				//wczytuje komende
-					//if (specjalCommand)
-						//if ( String.Equals(commandList[0],"destroy") )
-							//wyciagnij z komendy tylko kierunek
-							//commandList: [0] destroy    [1] tree
-							//wstaw do commadList[1]
-							//stage_1();
-						
-
-						//else if  //do build
-							//wyciagnij co (shed/house/villa)
-							//commandList: [0] build   [1]north   [2]villa
-							//wstaw do commadList[2] podnień
-							//commandList: [0] build   [1]villa
-							//stage_1();
+				output += "\n[robot]> You can destroy a "+ commandList[1] +" in the "+N+" "+S+" "+E+" "+W+". Which one do you choose?";
 				
 
-				
-				//z odpowiedzi uzytkownika tworzy czysta komende i wciska ja na 3 miejsce commandList
-					//potem wykonuje stage_1 od nowa posiadajac juz cala komende
-					//musi wiedziec ze to nie jest noemalna komenda ktora dostal tylko kierunek ktory ma wyjac i wcisnac do pierwszej
+				//specjalna komenda
+				specjalCommand = true;
+				return 0;
 
-					//
-				}
+			    //z odpowiedzi uzytkownika wyciaga kierunek i wciska go na 2 miejsce commandList[1]
+				//potem wykonuje stage_1 od nowa posiadajac juz cala komende
+				//jeśli nie podał kierunku to stage_1 znowu to zweryfikuje
+
+			}
 			return 0;	
 		}
 		
