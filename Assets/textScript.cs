@@ -64,7 +64,16 @@ public class textScript : MonoBehaviour {
 		commands.Add("right",2);
 		commands.Add("house",3);
 		commands.Add("shed",3);
-		commands.Add("villa",3);
+        commands.Add("villa",3);
+        commands.Add("opera",3);
+        commands.Add("fountain",3);
+        commands.Add("castle",3);
+        commands.Add("railway",3);
+        commands.Add("okraglak",3);
+        commands.Add("trunks",3);
+        commands.Add("ruins",3);
+        commands.Add("ashes",3);
+        commands.Add("tree",3);
 		commands.Add("north",2);
 		commands.Add("south",2);
 		commands.Add("east",2);
@@ -424,6 +433,7 @@ public class textScript : MonoBehaviour {
 			return -Vector2.right;
 		return Vector2.zero;
 	}
+    
 	string hitColliderName (string direction) {
 		Vector2 vector = translateDirection(direction); 
 		RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, i, myLayerMask);	
@@ -464,7 +474,7 @@ public class textScript : MonoBehaviour {
 				destroyPrefab(direction);
 				addPrefab(x, y, "trunks");
 		}
-		if ( (String.Equals(prefab_name, "shed")) || (String.Equals(prefab_name, "shed(Clone)")) ){
+		else if ( (String.Equals(prefab_name, "shed")) || (String.Equals(prefab_name, "shed(Clone)")) ){
 				destroyPrefab(direction);
 				addPrefab(x, y, "ashes");
 		}
@@ -480,7 +490,7 @@ public class textScript : MonoBehaviour {
     		// destroy north house
     	if (containsDirection(commandList[1])) { // jeśli podał kierunek
     			
-    		if ( String.Equals(commandList[1],"north") )
+    	    if ( String.Equals(commandList[1],"north") )
     			y=i;
     		if ( String.Equals(commandList[1],"south") )
     			y=-i;
@@ -488,9 +498,9 @@ public class textScript : MonoBehaviour {
     			x=-i;
     		if ( String.Equals(commandList[1],"east") )
     			x=i;	
-    	    
-             if ( (containsBuilding(commandList[2])) || (String.Equals(commandList[2],"tree")) ) { //jesli podal budynek lub drzewo
-    			if ( (containsBuilding(hitColliderName(commandList[1]))) || (String.Equals(hitColliderName(commandList[1]),"tree")) ){//czy w kierunku ktory podal jest budynek/drzewo ktory podal
+            Debug.Log(commandList.Count);
+            if ( commandList.Count > 2 && ((containsBuilding(commandList[2])) || (String.Equals(commandList[2],"tree"))) )  { //jesli podal budynek lub drzewo
+    		    if ( (containsBuilding(hitColliderName(commandList[1]))) || (String.Equals(hitColliderName(commandList[1]),"tree")) ){//czy w kierunku ktory podal jest budynek/drzewo ktory podal
 
     				matchRemains( commandList[2], commandList[1]);
     				commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
@@ -507,7 +517,7 @@ public class textScript : MonoBehaviour {
     			}
     		}
     			//jesli podal cokolwiek do clear
-    		if ( containsRemains(commandList[2]) ) { //podal co wyczyscic
+            if ( commandList.Count > 2 && containsRemains(commandList[2]) ) { //podal co wyczyscic
     				 
     				//hitColliderName dostaje kierunek zwraca nazwe collidera
     				//containsRemains porownuje slowo dostane z ruins/ashes/trunks
@@ -527,22 +537,22 @@ public class textScript : MonoBehaviour {
 			else { //jesli nie podal co usunac tylko kierunek
 				if (String.Equals ((hitColliderName(commandList[1])), "grass")) {
 					Debug.Log("There is nothing to destroy.");
-					commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 					return 0;
 				}
 				if (containsNietBud(hitColliderName(commandList[1])) ){
 					Debug.Log("You mustn't destroy city's property!");
-					commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 					return 0;
 				}
 				if ( containsRemains(hitColliderName(commandList[1])) ){ //TO DO clear
 					destroyPrefab(commandList[1]);
-					commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 					return 0;
 				}
 				else {
 					matchRemains(hitColliderName(commandList[1]),commandList[1]);
-					commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
+					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 					return 0;
 				}
 			}
@@ -562,16 +572,16 @@ public class textScript : MonoBehaviour {
 			y=0; 
 
 		    
-			if ( hitCollider("north") && String.Equals(hitColliderName("north"),commandList[1]) ) { //jesli jest na polnocy to co chce skasowac
+            if ( hitCollider("north") && hitColliderName("west").Contains(commandList[1]) ) { //jesli jest na polnocy to co chce skasowac
 				N="north";
 			}
-			if ( hitCollider("south") && String.Equals(hitColliderName("south"),commandList[1]) ) {
+            if ( hitCollider("south") && hitColliderName("west").Contains(commandList[1]) ) {
 				S="south";
 			}
-			if ( hitCollider("east") && String.Equals(hitColliderName("east"),commandList[1]) ) {
+            if ( hitCollider("east") && hitColliderName("west").Contains(commandList[1]) ) {
 				E="east";
 			}
-			if ( hitCollider("west") && String.Equals(hitColliderName("west"),commandList[1]) ) {
+			if ( hitCollider("west") && hitColliderName("west").Contains(commandList[1]) ) {
 				W="west";
 			}
 			
@@ -587,8 +597,11 @@ public class textScript : MonoBehaviour {
 						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 						return 0;
 					}
-					else
+					else {
 						matchRemains( commandList[1],"north" );
+                        commandList.RemoveRange(0,2);
+                        return 0;  
+                    }
 				}
 				if ( String.Equals(S,"south") ) {//jesli cos jest na polnocy
 					y=-i;
@@ -598,8 +611,11 @@ public class textScript : MonoBehaviour {
 						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 						return 0;
 					}
-					else
+					else {
 						matchRemains( commandList[1],"south" );
+                        commandList.RemoveRange(0,2);
+                        return 0;  
+                    }
 				}
 				if ( String.Equals(E,"east") ) {//jesli cos jest na polnocy
 					x=i;
@@ -609,8 +625,11 @@ public class textScript : MonoBehaviour {
 						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 						return 0;
 					}
-					else
+					else {
 						matchRemains( commandList[1],"east" );
+                        commandList.RemoveRange(0,2);
+                        return 0;  
+                    }
 				}
 				if ( String.Equals(W,"west") ) {//jesli cos jest na polnocy
 					x=-i;
@@ -620,9 +639,12 @@ public class textScript : MonoBehaviour {
 						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 						return 0;
 					}
-					else
+					else {
 						matchRemains( commandList[1],"west" );
-				}
+                        commandList.RemoveRange(0,2);
+                        return 0;    
+                    } 
+                }
             }
 			else { //jesli wiecej niz 1 jest prawdziwe
 					//int oldLength = commmandList.Count;
