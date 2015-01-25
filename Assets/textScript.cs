@@ -34,7 +34,7 @@ public class textScript : MonoBehaviour {
 			output += "\n[robot]> I don't understand you.";
 		}	
 		else 
-			stage_1 ();
+			fork ();
 		//output += commandText + "Robot:" + roboText; 
 	}
 	void Awake () { 
@@ -137,6 +137,8 @@ public class textScript : MonoBehaviour {
 		    commandList.InsertRange(commandList.Count, tempCommand); // wstawia na koniec
         }	
         specialCommand = false;
+		constructions = false;
+		directions = false;
 		if (commandList.Count == 0)
 			return "pusta"; //lista pusta lub zła komenda
 		else
@@ -152,31 +154,35 @@ public class textScript : MonoBehaviour {
 		}    
 	}
 
-//-----------------------------------------------------------------STAGE_1-------------------------------------------
+//-----------------------------------------------------------------fork-------------------------------------------
 
-	void stage_1() {
-		Debug.Log ("jestem w stage_1");
+	void fork() {
+		Debug.Log ("jestem w fork");
 		Debug.Log("slowo 1 = "+commandList[0]);
 
         if ( commandList.Count > 0 && String.Equals(commandList[0], "go") ) {
   			go();
   		}
-		if ( commandList.Count > 0 && String.Equals(commandList[0], "money") ) {
+		else if ( commandList.Count > 0 && String.Equals(commandList[0], "money") ) {
 			takeMoney();
 		}		
 		
-		if ( commandList.Count > 0 && String.Equals(commandList[0], "build") ){
+		else if ( commandList.Count > 0 && String.Equals(commandList[0], "build") ){
   			build();
   		}
 
-        if ( commandList.Count > 0 && String.Equals(commandList[0], "destroy") ){
+		else if ( commandList.Count > 0 && String.Equals(commandList[0], "destroy") ){
   		    destroy();  
         }
-        if ( commandList.Count > 0 && String.Equals(commandList[0], "clear") ){
+		else if ( commandList.Count > 0 && String.Equals(commandList[0], "clear") ){
 			destroy();
   		}
+		else{
+			output = "\n[robot}> I don't understand you. Can you rephrase?";
+			commandList.RemoveRange(0, commandList.Count);
+		}
 		if ( !specialCommand && commandList.Count > 0 )
-			stage_1();
+			fork();
 	}
 //------------------------------------------------------------TAKE MONEY---------------------------------------------
 	void takeMoney(){
@@ -712,8 +718,8 @@ public class textScript : MonoBehaviour {
 				return 0;
 
 			    //z odpowiedzi uzytkownika wyciaga kierunek i wciska go na 2 miejsce commandList[1]
-				//potem wykonuje stage_1 od nowa posiadajac juz cala komende
-				//jeśli nie podał kierunku to stage_1 znowu to zweryfikuje
+				//potem wykonuje fork od nowa posiadajac juz cala komende
+				//jeśli nie podał kierunku to fork znowu to zweryfikuje
 
 			}
 			return 0;	
