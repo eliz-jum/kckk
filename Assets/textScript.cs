@@ -1,21 +1,4 @@
-﻿
-
-/*
-WCZYTUJE INPUT
-	TWORZY CZYSTA KOMENDE W LISCIE
-		NP Dear Robot please build me a beautidul house, a shed in the west and distroy this stupid tree! 
-		BUILD HOUSE BUILD WEST SHED DISTROY TREE
-		slowo_1 = build / distroy
-		slowo_2 = north / west itp
-		slowo_3 = shed / house / villa
-		
-		
-		IF FOR EACH =="?"
-		JEDNA Z ILUS UNIWERSALNYCH ODPOOWIEDZI
-		ELSE
-		stage_1();
-*/
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using System;
@@ -34,7 +17,11 @@ public class textScript : MonoBehaviour {
 	public float x, y = 0;
 	public LayerMask myLayerMask;
 	public Transform parposition;
-	private bool specjalCommand;
+	private bool specialCommand;
+	private int shedMoney = 25;
+	private int houseMoney = 50;
+	private int villaMoney = 75;
+	private bool no=false, constructions=false, directions=false;
 	
 	void OnSubmit(string line) {
 		string commandLog;
@@ -58,6 +45,7 @@ public class textScript : MonoBehaviour {
 		commands.Add("build",1);//drugi argument w nawiasie to będzie np. jakiś wskaźnik na funkcje
 		commands.Add("destroy",1);
 		commands.Add("clear",1);
+		commands.Add("money",1);
 		commands.Add("go",1);
 		commands.Add("up",2);
 		commands.Add("down",2);
@@ -78,7 +66,7 @@ public class textScript : MonoBehaviour {
 		commands.Add("north",2);
 		commands.Add("south",2);
 		commands.Add("east",2);
-		commands.Add("west",2);
+		commands.Add("west", 2);
 		commands.Add("?",0);
 	}
 	string Parser(string command) {
@@ -103,33 +91,52 @@ public class textScript : MonoBehaviour {
 				if (String.Equals(commands[word],3))  {
 					tempCommand.Add (word);
 				}
+				if (String.Equals(word,"no"))  {
+					no = true;
+				}
+
                 //odpowiedź użytkownika na zadanie pytania 
-                if (specjalCommand) {
+                if (specialCommand) {
                     //sprawdza czy podal kierunek do funkcji destroy
                     if ( (String.Equals(commandList[0],"destroy") || (String.Equals(commandList[0],"clear"))) && containsDirection(word)) { 
                         commandList.Insert(1,word); // wciska kierunek na commanList[1]
                     }
-                    if (String.Equals(commandList[0],"build")) {
-                        ;
+
+
+					//pytanie: do you want to build ..
+					//odp: I don't want to build a shed
+					//to wcisnie do listy
+					//a potem, skoro no==true to usunie komende
+
+					//zapytanie o kierunek
+					if (String.Equals(commandList[0],"build") && (directions) && (containsDirection(word)) ) {
+
+					 
+						if ( containsDirection(commandList[1]) )//jesli byl tam stary kierunek
+							commandList[1]=word;
+						else
+							commandList.Insert(1,word); //wsadz kierunek na commandList[1]
+					}
+					//zapytanie o budynek
+					if (String.Equals(commandList[0],"build") && (constructions) && (containsBuilding(word)) ) {	
+						if ( containsBuilding(commandList[2]) )//jesli byl tam stary budynek
+							commandList[1]=word;
+						else
+							commandList.Insert(2,word); //wsadz budynek na commandList[2]
                     }
                 }
 			}
 		} 
-   
-		//ZAPYTAJ O DRUGIE SŁOWO JEŚLI NIE GO NIE MA
-            //else if  //do build
-                //wyciagnij co (shed/house/villa)
-                //commandList: [0] build   [1]north   [2]villa
-                //wstaw do commadList[2] podnień
-                //commandList: [0] build   [1]villa
-                //stage_1();
+   		if (no) {
+			commandList.RemoveRange(0, 3);
+		}
                 
       
-        if (!specjalCommand) {
+        if (!specialCommand) {
             swap(tempCommand);
 		    commandList.InsertRange(commandList.Count, tempCommand); // wstawia na koniec
         }	
-        specjalCommand = false;
+        specialCommand = false;
 		if (commandList.Count == 0)
 			return "pusta"; //lista pusta lub zła komenda
 		else
@@ -144,6 +151,9 @@ public class textScript : MonoBehaviour {
 			commandList[2] = temp;
 		}    
 	}
+
+//-----------------------------------------------------------------STAGE_1-------------------------------------------
+
 	void stage_1() {
 		Debug.Log ("jestem w stage_1");
 		Debug.Log("slowo 1 = "+commandList[0]);
@@ -151,21 +161,43 @@ public class textScript : MonoBehaviour {
         if ( commandList.Count > 0 && String.Equals(commandList[0], "go") ) {
   			go();
   		}
-  		/*
-
-  		if commandList[0]==build{
-  			stage_2();
+		if ( commandList.Count > 0 && String.Equals(commandList[0], "money") ) {
+			takeMoney();
+		}		
+		
+		if ( commandList.Count > 0 && String.Equals(commandList[0], "build") ){
+  			build();
   		}
-  		*/
+
         if ( commandList.Count > 0 && String.Equals(commandList[0], "destroy") ){
   		    destroy();  
         }
         if ( commandList.Count > 0 && String.Equals(commandList[0], "clear") ){
-  			destroy();
+			destroy();
   		}
-		if ( !specjalCommand && commandList.Count > 0 )
-			stage_1 ();
+		if ( !specialCommand && commandList.Count > 0 )
+			stage_1();
 	}
+//------------------------------------------------------------TAKE MONEY---------------------------------------------
+	void takeMoney(){
+		//jesli jest przy banku
+		if ( (String.Equals (hitColliderName("north"), "bank")) || (String.Equals (hitColliderName("south"), "bank")) ||
+			(String.Equals (hitColliderName("east"), "bank")) || (String.Equals (hitColliderName("west"), "bank")) ) {
+			//jesli ma wystarczajaco pieniedzy
+			if (Money.money > 299)
+				output += "\n[robot]> You have enough! Don't be greedy!";
+			else{
+				Money.money = Money.money + 100;
+				output += "\n[robot]> I've withdrawn $100 for you.";
+			}
+		}
+		//jesli nie ma go brzy banku
+		else
+			output += "\n[robot]> You have to go to the bank.";
+	}
+
+//------------------------------------------------------------GO---------------------------------------------
+
 	int go() {
 		//Debug.Log(commandList [0]);
 		//Debug.Log(commandList [1]);
@@ -234,172 +266,160 @@ public class textScript : MonoBehaviour {
 		}
         return 0;
 	}
-	
-	/*GDZIE BUDUJE
+
+
+//-----------------------------------------------------------------------BUILD----------------------------------------------
+
+
+	void offerHouse(){
+		if ( Money.money < shedMoney ) //nie ma na nic pieniedzy
+			output += "\n[robot]> You don't have money for any construction. You have to go to the bank and withdraw the money.";
 		
-	void stage_2(){
-		if commandList[1]== slowo_2   //jesli podal kierunek
-		{
-			//USTALANIE WSPOLRZEDNYCH
-				float i = 0.8f;				TO MUSZA BYC ZMIENNE PUBLICZE ALBO PRZEKAZYWANE DO FUNKCJI
-				float x=0;
-			float y=0;
-			if commandList[1]=="north"
-				y=i;
-			if commandList[1]=="south"
-				y=-i;
-			if commandList[1]=="west"
-				x=-i;
-			if commandList[1]=="east" //prawo
-				x=i;
-			
-			
-			if raycast na kierunek == grass 
-				stage_3();
-			
-			
-			else
-				if raycast == tree
-					"First You have to cut the tree"
-						"Do you want to do it now?"
-						if imput == "yes"
-							destroyPrefab( ?, tree); //usowa drzewao
-			addPrefab ( x, y, trunks) //pokazuje pienki
-				stage_2(); //bo zostaly pienki wiec wykona sie jeszcze raz i wejdzie do kolejnego if'a
-			//jesli nie to na koncu poda mozliwosc innych lokalizacji
-			else 
-				offer_directions();
-			if  raycast == house/villa/shed
-				prefab_name = raycast
-					"First You have to distroy the"+prefab_name
-					"Do you want to do it now(yes/no)?"
-					if input == "yes"
-						destroyPrefab( direction ?, prefab name) //usowa ville / dom / szalas
-							if prefab_name == shed
-								addPrefab ( x, y, ashes) //pokazuje popioly
-									else
-										addPrefab ( x, y, ruins) //pokazuje ruiny
-											
-											stage_2(); //bo zostaly popioly / ruiny
-			else 
-				offer_directions();
-			
-			if raycast == trunks || ruins || ashes
-				prefab_name = raycast
-					"U have to clear the "+prefab_name
-					"Do you want to do it now?"
-					if input == "yes"
-						destroyPrefab( direction ?, prefab_name) //usowa pienki / ruiny / popioly
-							stage_3(); //bo moze budowac
-			else 
-				offer_directions();
-			if raycast == pegaz || zamek || fontanna || tory ||okraglak    //TRZEBA ZMIENIC NAZWY NA ANGIELSKIE!!!
-				prefab_name = raycast //to w co uderzyl raycast
-					"This is"+prefab_name+"! You can't build here!"
-					offer_directions();
-			
-			
-		}
+		if ( Money.money >= villaMoney )
+			output += "\n[robot]> You can build a villa, a house or a shed there. Which one do you choose?";
 		
-		else { //jesli nie podal kierunku
-			offer_directions();
-			
-		}
-		
-	}
-	
-	PROPONOWANIE KIERUNKOW
-	void offer_directions(){
-		if raycast(up)!= grass && (down) && (left) && (right) //jesli nigdzie nie moze budowac
-			"There is no ground you can build on. you have to either move or clear the area."
-				
-				CZYSCI CALA LISTE/komendę
-				
-				else
-					if raycast(up) == grass
-						"You can build in the north."
-							if raycast(down) == grass
-								" You can build in the south."
-									if raycast(left) == grass
-										" You can build in the west."
-											if raycast(right) == grass
-												" You can build in the east."
-													
-													
-													"Do you want to choose another direction?"
-													if input == no
-														BREAK ;
+		if ( Money.money >= houseMoney )
+			output += "\n[robot]> You can build a house or a shed. Which one do you choose?";
 		else
-			zapisuje zdanie
-				szuka slowa_2 //np z ospowiedzi   Yes I want to build it in the north   wyciagnie north
-				if nie ma słowa_2
-					"Name your direction."
-						zapisuje zdanie
-						szuka slowa_2 //np z ospowiedzi   Yes I want to build it in the north   wyciagnie north	
-						wpycha je do listy jako lista(2)
-						stage_2();
-		else 
-			wpycha je do listy jako lista(2)
-				stage_2();
-		//wykonuje jeszcze raz stage_2 zeby sprawdzic czy nie wybral niedozwolonego kierunku
+			output += "\n[robot]> You can build only a shed.";
 		
+		output += "\n[robot]> If you want to build a cheaper construction name it. If you don't just say 'no'";
+		
+		specialCommand=true;
+		constructions=true;
+
 	}
 	
 	
 	
 	
 	
-	CO BUDUJE
+
+	//GDZIE BUDUJE
 		
-	void Stage_3(){
-		if commandList[2] != slowo_3{ //jesli nie podal co ma zbudowac
-			sprawdz ile ma pieniedzy
-				if money < shed_money
-					"You don't have money for any construction. You have to go to the bank and withdraw the money."
-						else
-							offer_house();
-			
-			
-			else { //jesli podal
-				string prefab_name = commandList[2];
-				if money < prefab_name.money //jesli mu nie starczy pieniedzy na to co chce zbudowac
-					offer_house();
-				
+	void build(){
+		if (containsDirection (commandList [1])) {   //jesli podal kierunek
+		
+			x = 0;
+			y = 0;
+			if (String.Equals (commandList [1], "north"))
+					y = i;
+			if (String.Equals (commandList [1], "south"))
+					y = -i;
+			if (String.Equals (commandList [1], "west"))
+					x = -i;
+			if (String.Equals (commandList [1], "east"))
+					x = i;
+
+			//jesli tam jest trawa to buduj
+			if (String.Equals (hitColliderName (commandList [1]), "grass")) 
+				construct (x, y);
+
+			else {//podal zly kierunek - tam cos jest
+				if (containsNietBud (commandList [1]))
+					output += "\n[robot]> You mustn't destroy city's property!";
 				else
-					addPrefab(x, y, prefab_name) //funkcja budujaca
-						USUN Z LISTY 3 pierwsze
-						
-						JESLI COS JESZCZE ZOSTALO W LISCIE TO 
-						stage_1();
+					output += "\n[robot]> First you have to get rid of " + hitColliderName (commandList [1]) + ".";
+ 
+				offerDirections ();
+
 			}
-			
-			
-			
 		}
 		
+		else  //jesli nie podal kierunku
+			offerDirections();
+
 		
+	}
+	
+	//PROPONOWANIE KIERUNKOW
+	void offerDirections(){
+
+		string N="";
+		string S="";
+		string E="";
+		string W="";
+ 
+				
+		if ( String.Equals(hitColliderName("north"), "grass") ) //jesli jest na polnocy trawa
+			N="north";
 		
-		void offer_house(){
-			"You don't have enough money"
-				"Do you want to build a cheaper house?"
-					if money >= house_money
-						"You can build a house or a shed."
-							else
-								"You can build only a shed."
-									
-									if input=="no"
-										BREAK???
-											USUN Z LISTY
-											else
-												input np "Yes, a shed" albo "Yes."
-													zapisz zdanie
-													for each szukaj slowa nr 2
-														slowo_2 = znalezione slowo       -----zmienna publiczna!
-															wcisnij ja do listy jako commandList[1]
-															stage_3();
+		if ( String.Equals(hitColliderName("south"), "grass") ) 
+			S="south";
+		
+		if ( String.Equals(hitColliderName("east"), "grass") )
+			E="east";
+		
+		if ( String.Equals(hitColliderName("west"), "grass") )
+			W="west";
+		
+
+
+		if ( String.Equals(N,"") && String.Equals(E,"") && String.Equals(W,"") && String.Equals(S,"") ) //nigdzie nie ma trawy
+			output += "\n[robot]> There is no ground you can build on. you have to either move or clear the area.";
+
+		else{//gdzies jest trawa
+			output += "\n[robot]> If you want you can build in the "+N+" "+S+" "+E+" "+W+".\nIf so choose a direction, if not just say 'no'.";
+			specialCommand=true;//z kierunkiem
+			directions=true;
+
 		}
 
-*/
+	}
+
+	
+
+	
+	
+	//CO BUDUJE
+		
+	void construct(int x, int y){
+		//jesli nie podal co ma zbudowac
+		if ( !containsBuilding(commandList[2]) )
+			offerHouse();
+			
+		else { //jesli podal co ma zbudowac
+			if ( String.Equals(commandList[2], "shed") ){
+				if ( Money.money < shedMoney ){
+					output += "\n[robot]> You don't have enough money";
+					offerHouse();
+				}
+				else
+					addPrefab(x, y, "shed" );
+			}
+
+			if ( String.Equals(commandList[2], "house") ){
+				if ( Money.money < shedMoney ){
+					output += "\n[robot]> You don't have enough money";
+					offerHouse();
+				}
+				else
+					addPrefab(x, y, "house" );
+			}
+
+			if ( String.Equals(commandList[2], "villa") ){
+				if ( Money.money < shedMoney ){
+					output += "\n[robot]> You don't have enough money";
+					offerHouse();
+				}
+				else
+					addPrefab (x, y, "villa" );
+			}		
+		}
+			
+	}	
+			
+
+
+		
+		
+		
+
+		
+
+
+
+
 	bool containsDirection(string slowo) {
 		if (String.Equals(slowo, "north"))
 			return true;
@@ -441,6 +461,8 @@ public class textScript : MonoBehaviour {
 		if ( (String.Equals(slowo, "castle")) )
 			return true;
 		if ( (String.Equals(slowo, "okraglak")) )
+			return true;
+		if ( (String.Equals(slowo, "bank")) )
 			return true;
 		return false;
 	}
@@ -681,12 +703,12 @@ public class textScript : MonoBehaviour {
                 }
             }
 			else { //jesli wiecej niz 1 jest prawdziwe
-					
+
 				output += "\n[robot]> You can destroy a "+ commandList[1] +" in the "+N+" "+S+" "+E+" "+W+". Which one do you choose?";
 				
 
 				//specjalna komenda
-				specjalCommand = true;
+				specialCommand = true;
 				return 0;
 
 			    //z odpowiedzi uzytkownika wyciaga kierunek i wciska go na 2 miejsce commandList[1]
