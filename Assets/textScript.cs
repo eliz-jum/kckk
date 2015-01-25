@@ -23,7 +23,8 @@ public class textScript : MonoBehaviour {
 	private int villaMoney = 75;
 	private bool no=false, constructions=false, directions=false;
     public GameObject obj; //txt 
-    private DisplayMoney DisplayMoneyInstantion;	
+    private DisplayMoney DisplayMoneyInstantion;
+	private string[] randomAnswers = new string[10];
 
 	void OnSubmit(string line) {
 		string commandLog;
@@ -83,6 +84,19 @@ public class textScript : MonoBehaviour {
 		commands.Add("east",2);
 		commands.Add("west", 2);
 		commands.Add("no",0);
+
+
+		randomAnswers[0] = "\n[robot]> Sorry, I don't know.";
+		randomAnswers[0] = "\n[robot]> That's a hard question.";
+		randomAnswers[0] = "\n[robot]> Why do you ask?";
+		randomAnswers[0] = "\n[robot]> It's a secret.";
+		randomAnswers[0] = "\n[robot]> I'm too busy to answer right now.";
+		randomAnswers[0] = "\n[robot]> You're too young to know.";
+		randomAnswers[0] = "\n[robot]> Do not ask me SUCH questions!";
+		randomAnswers[0] = "\n[robot]> I forgot.";
+		randomAnswers[0] = "\n[robot]> If I charged you $1 for each question, would you still be asking?";
+		randomAnswers[0] = "\n[robot]> 42";
+
 	}
 
 
@@ -99,7 +113,7 @@ public class textScript : MonoBehaviour {
 
  	string Parser(string command) {
 		//JEŚLI ZNAK ZAPYTANA TO LOSUJ JEDNĄ Z ODPOWIEDZI ELSE PONIŻSZE
-		string[] words = command.Split(new Char [] {' ', ',', '.', ':', '\t', '?' }); // wyrzucić "?"
+		string[] words = command.Split(new Char [] {' ', ',', '.', ':', '\t', '?', '!' }); // wyrzucić "?"
 		List<string> tempCommand = new List<string>();
 		string buildWord = "";
 		//posortować stringa
@@ -147,7 +161,7 @@ public class textScript : MonoBehaviour {
 					}
 					//zapytanie o budynek
 					if (String.Equals(commandList[0],"build") && (constructions) && (containsBuilding(word)) ) {	
-						if ( containsBuilding(commandList[2]) )//jesli byl tam stary budynek
+						if ( commandList.Count>2 && containsBuilding(commandList[2]) )//jesli byl tam stary budynek
 							commandList[1]=word;
 						else
 							commandList.Insert(2,word); //wsadz budynek na commandList[2]
@@ -156,7 +170,7 @@ public class textScript : MonoBehaviour {
 			}
 		} 
    		if (no) {
-            if (containsDirection(commandList[1]))
+			if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
 			    commandList.RemoveRange(0, 3);
             else
                 commandList.RemoveRange(0, 2);
@@ -226,6 +240,7 @@ public class textScript : MonoBehaviour {
 		//jesli nie ma go brzy banku
 		else
 			output += "\n[robot]> You have to go to the bank.";
+		commandList.RemoveRange (0, commandList.Count);
 	}
 
 //------------------------------------------------------------GO---------------------------------------------
@@ -304,22 +319,27 @@ public class textScript : MonoBehaviour {
 
 
 	void offerHouse(){
-		if ( DisplayMoneyInstantion.money < shedMoney ) //nie ma na nic pieniedzy
-			output += "\n[robot]> You don't have money for any construction. You have to go to the bank and withdraw the money.";
-		
-		if ( DisplayMoneyInstantion.money >= villaMoney )
-			output += "\n[robot]> You can build a villa, a house or a shed there. Which one do you choose?";
-		
-		if ( DisplayMoneyInstantion.money >= houseMoney )
-			output += "\n[robot]> You can build a house or a shed. Which one do you choose?";
-		else
-			output += "\n[robot]> You can build only a shed.";
-		
-		output += "\n[robot]> If you want to build a cheaper construction name it. If you don't just say 'no'";
-		
-		specialCommand=true;
-		constructions=true;
+		if (DisplayMoneyInstantion.money < shedMoney) {//nie ma na nic pieniedzy
+			output += "\nIn fact, you don't have money for any construction. You have to go to the bank and withdraw the money.";
+			if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
+				commandList.RemoveRange(0, 3);
+			else
+				commandList.RemoveRange(0, 2);
+		}
+		else {
+			if (DisplayMoneyInstantion.money >= villaMoney)
+					output += "You can build a villa, a house or a shed there.";
 
+			else if (DisplayMoneyInstantion.money >= houseMoney)
+					output += "\nYou can build a house or a shed.";
+			else
+					output += "\nYou can build only a shed.";
+
+			output += "\nIf you want to build a construction I offered - name it. If you don't just say 'no'";
+
+			specialCommand = true;
+			constructions = true;
+		}
 	}
 	
 	
@@ -333,21 +353,28 @@ public class textScript : MonoBehaviour {
         x = 0;
         y = 0;
 		if (commandList.Count > 1 && containsDirection (commandList [1])) {   //jesli podal kierunek
-			if (String.Equals (commandList [1], "north"))
+			Debug.Log(hitColliderName(commandList[1]));
+			if (String.Equals (commandList[1], "north"))
 					y = i;
-			if (String.Equals (commandList [1], "south"))
+			if (String.Equals (commandList[1], "south"))
 					y = -i;
-			if (String.Equals (commandList [1], "west"))
+			if (String.Equals (commandList[1], "west"))
 					x = -i;
-			if (String.Equals (commandList [1], "east"))
+			if (String.Equals (commandList[1], "east"))
 					x = i;
 
 			//jesli tam jest trawa to buduj
 			if (String.Equals (hitColliderName (commandList [1]), "grass")) 
 				construct ();
-
+			else if (!(hitCollider (commandList [1]))){
+				output += "\n[robot]> You mustn't build on the road!";
+				if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
+					commandList.RemoveRange(0, 3);
+				else
+					commandList.RemoveRange(0, 2);
+			}
 			else {//podal zly kierunek - tam cos jest
-				if (containsNietBud (commandList [1]))
+				if (containsNietBud (hitColliderName(commandList[1])) )
 					output += "\n[robot]> You mustn't destroy city's property!";
 				else
 					output += "\n[robot]> First you have to get rid of " + hitColliderName (commandList [1]) + ".";
@@ -357,9 +384,10 @@ public class textScript : MonoBehaviour {
 			}
 		}
 		
-		else  //jesli nie podal kierunku
+		else { //jesli nie podal kierunku
+			output += "\n[robot]> You didn't say where.";
 			offerDirections();
-
+		}
 		
 	}
 	
@@ -386,11 +414,15 @@ public class textScript : MonoBehaviour {
 		
 
 
-		if ( String.Equals(N,"") && String.Equals(E,"") && String.Equals(W,"") && String.Equals(S,"") ) //nigdzie nie ma trawy
+		if ( String.Equals(N,"") && String.Equals(E,"") && String.Equals(W,"") && String.Equals(S,"") ) { //nigdzie nie ma trawy
 			output += "\n[robot]> There is no ground you can build on. you have to either move or clear the area.";
-
+			if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
+				commandList.RemoveRange(0, 3);
+			else
+				commandList.RemoveRange(0, 2);
+		}
 		else {//gdzies jest trawa
-			output += "\n[robot]> If you want you can build in the "+N+" "+S+" "+E+" "+W+".\nIf so choose a direction, if not just say 'no'.";
+			output += "\nIf you want you can build in the "+N+" "+S+" "+E+" "+W+"\nIf so choose a direction, if not just say 'no'.";
 			specialCommand=true;//z kierunkiem
 			directions=true;
 
@@ -406,38 +438,51 @@ public class textScript : MonoBehaviour {
 		
 	void construct(){
 		//jesli nie podal co ma zbudowac
-		if ( !containsBuilding(commandList[2]) )
-			offerHouse();
 			
-		else { //jesli podal co ma zbudowac
+		if (commandList.Count>2 && containsBuilding(commandList[2]) ){ //jesli podal co ma zbudowac
 			if ( String.Equals(commandList[2], "shed") ){
 				if ( DisplayMoneyInstantion.money < shedMoney ){
-					output += "\n[robot]> You don't have enough money";
+					output += "\n[robot]> You don't have enough money, because a shed costs $"+shedMoney;
 					offerHouse();
 				}
-				else
+				else{
 					addPrefab(x, y, "shed" );
+					DisplayMoneyInstantion.money = DisplayMoneyInstantion.money - shedMoney;
+					output += "\n[robot]> I've built a "+commandList[2]+" in the "+commandList[1]+" for you.";
+					commandList.RemoveRange(0, 3);
+				}
 			}
 
-			if ( String.Equals(commandList[2], "house") ){
-				if ( DisplayMoneyInstantion.money < shedMoney ){
-					output += "\n[robot]> You don't have enough money";
+			else if ( String.Equals(commandList[2], "house") ){
+				if ( DisplayMoneyInstantion.money < houseMoney ){
+					output += "\n[robot]> You don't have enough money, because a house costs $"+houseMoney;
 					offerHouse();
 				}
-				else
+				else{
 					addPrefab(x, y, "house" );
+					DisplayMoneyInstantion.money = DisplayMoneyInstantion.money - houseMoney;
+					output += "\n[robot]> I've built a "+commandList[2]+" in the "+commandList[1]+" for you.";
+					commandList.RemoveRange(0, 3);
+				}
 			}
 
-			if ( String.Equals(commandList[2], "villa") ){
-				if ( DisplayMoneyInstantion.money < shedMoney ){
-					output += "\n[robot]> You don't have enough money";
+			else if ( String.Equals(commandList[2], "villa") ){
+				if ( DisplayMoneyInstantion.money < villaMoney ){
+					output += "\n[robot]> You don't have enough money, because a villa costs $"+villaMoney;
 					offerHouse();
 				}
-				else
+				else{
 					addPrefab (x, y, "villa" );
+					DisplayMoneyInstantion.money = DisplayMoneyInstantion.money - villaMoney;
+					output += "\n[robot]> I've built a "+commandList[2]+" in the "+commandList[1]+" for you.";
+					commandList.RemoveRange(0, 3);
+				}
 			}		
 		}
-			
+		else {//nie podal co ma zbudowac
+			output += "\n[robot]> You didn't say what.";
+			offerHouse();
+		}	
 	}	
 			
 
@@ -590,7 +635,9 @@ public class textScript : MonoBehaviour {
     			else { //w tym kierunku jest cos innego
     				// np na gorze jest home a on pisze "Destroy shed in the north."
     				output += "\n[robot]> You can't destroy the "+commandList[2]; //You can't destroy a shed
-    				output += "\n[robot]> In the "+commandList[1]+" there is/are the "+hitColliderName(commandList[1]); //in the north there is a home.
+    				output += "\nIn the "+commandList[1]+" there is/are the "+hitColliderName(commandList[1]); //in the north there is a home.
+					if ( !hitCollider(commandList[1]) )
+						output += "road.";
     				commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
     				return 0;
     						
@@ -610,6 +657,8 @@ public class textScript : MonoBehaviour {
     			else {
     				output += "\n[robot]> You can't clear "+commandList[2]; 
     				output += "\n[robot]> In the "+commandList[1]+" there is the " + hitColliderName(commandList[1]);
+					if ( !hitCollider(commandList[1]) )
+						output += "road.";
     				commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
     				return 0;
     			}
@@ -621,12 +670,17 @@ public class textScript : MonoBehaviour {
 					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 					return 0;
 				}
-				if (containsNietBud(hitColliderName(commandList[1])) ){
+				else if ( !hitCollider(commandList[1]) ) {
+					output += "\n[robot]> You mustn't destroy the road!";
+					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
+					return 0;
+				}
+				else if (containsNietBud(hitColliderName(commandList[1])) ){
 					output += "\n[robot]> You mustn't destroy city's property!";
 					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 					return 0;
 				}
-				if ( containsRemains(hitColliderName(commandList[1])) ){ //TO DO clear
+				else if ( containsRemains(hitColliderName(commandList[1])) ){ //TO DO clear
 					destroyPrefab(commandList[1]);
 					output += "\n[robot]> I've cleared what you'd wanted me to.";
 					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
