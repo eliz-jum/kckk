@@ -1319,6 +1319,7 @@ GameObject:
   - 224: {fileID: 460059313}
   - 222: {fileID: 460059315}
   - 114: {fileID: 460059314}
+  - 114: {fileID: 460059316}
   m_Layer: 5
   m_Name: Money
   m_TagString: Untagged
@@ -1375,6 +1376,17 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 460059312}
+--- !u!114 &460059316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 460059312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cf63cad00050404789e63d431939ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &494194825
 Prefab:
   m_ObjectHideFlags: 0
