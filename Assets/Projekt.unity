@@ -1387,6 +1387,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cf63cad00050404789e63d431939ce3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  money: 100
 --- !u!1001 &494194825
 Prefab:
   m_ObjectHideFlags: 0
@@ -1978,7 +1979,7 @@ GameObject:
   - 212: {fileID: 745364081}
   - 50: {fileID: 745364079}
   - 61: {fileID: 745364078}
-  - 114: {fileID: 745364077}
+  - 114: {fileID: 745364076}
   m_Layer: 2
   m_Name: robot
   m_TagString: Untagged
@@ -1986,7 +1987,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &745364077
+--- !u!114 &745364076
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -1997,9 +1998,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbeee2544ab0bd147ad3b4ae5ddd2076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  userInput: {fileID: 436001843}
+  userInput: {fileID: 0}
   roboTalk: {fileID: 0}
-  output: 
+  output: '
+
+    Czekam na polecenia.'
   wholeCommand: []
   i: .800000012
   x: 0
@@ -2008,6 +2011,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   parposition: {fileID: 745364082}
+  obj: {fileID: 460059312}
 --- !u!61 &745364078
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2063,7 +2067,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 745364075}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 193.5, y: 156, z: 0}
+  m_LocalPosition: {x: 187.899994, y: 159.199997, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

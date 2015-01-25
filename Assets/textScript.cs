@@ -22,7 +22,9 @@ public class textScript : MonoBehaviour {
 	private int houseMoney = 50;
 	private int villaMoney = 75;
 	private bool no=false, constructions=false, directions=false;
-	
+    public GameObject obj; //txt 
+    private DisplayMoney DisplayMoneyInstantion;	
+
 	void OnSubmit(string line) {
 		string commandLog;
 		//Debug.Log ("OnSubmit("+line+")");
@@ -30,11 +32,22 @@ public class textScript : MonoBehaviour {
 		//		roboText = Parser (line);
 		output += "\n[user]> "+line;
 		commandLog = Parser (line);
-		if ( String.Equals(commandLog,"pusta") ) {
-			output += "\n[robot]> I don't understand you.";
-		}	
-		else 
-			fork ();
+        specialCommand = false;
+        constructions = false;
+        directions = false;
+		if (String.Equals(commandLog, "pusta"))
+      {
+            if (!no)
+                output += "\n[robot]> I don't understand you.";
+            else {
+                output += "\n[robot]> Ok.";
+                no = false;
+            }
+      } else
+        { 
+          no = false;
+          fork();
+        }
 		//output += commandText + "Robot:" + roboText; 
 	}
 	void Awake () { 
@@ -59,6 +72,8 @@ public class textScript : MonoBehaviour {
         commands.Add("castle",3);
         commands.Add("railway",3);
         commands.Add("okraglak",3);
+        commands.Add("bank",3);
+        commands.Add("warehouse",3);
         commands.Add("trunks",3);
         commands.Add("ruins",3);
         commands.Add("ashes",3);
@@ -67,9 +82,22 @@ public class textScript : MonoBehaviour {
 		commands.Add("south",2);
 		commands.Add("east",2);
 		commands.Add("west", 2);
-		commands.Add("?",0);
+		commands.Add("no",0);
 	}
-	string Parser(string command) {
+
+
+
+   
+    // Use this for initialization
+    void Start () {
+      DisplayMoneyInstantion = (DisplayMoney)obj.GetComponent (typeof(DisplayMoney));
+      //Debug.Log(DisplayMoneyInstantion.money);
+      //objCash = GetComponent<Text> ();
+      //Debug.Log (textScriptInstantion.output);
+      //txtx.text = textScriptInstantion.output;
+    }
+
+ 	string Parser(string command) {
 		//JEŚLI ZNAK ZAPYTANA TO LOSUJ JEDNĄ Z ODPOWIEDZI ELSE PONIŻSZE
 		string[] words = command.Split(new Char [] {' ', ',', '.', ':', '\t', '?' }); // wyrzucić "?"
 		List<string> tempCommand = new List<string>();
@@ -79,11 +107,11 @@ public class textScript : MonoBehaviour {
 			//if  exists word < processState break i powiedz jestem w trakcie wykonywania polecenia nie mogę zbudować/ zburzyć 
 			//robot powtarza jeszcze raz czego potrzebuje
 			if (commands.ContainsValue(commands[word])) {
-				if (String.Equals(commands[word],1) /*&& (1 > processState)*/) {
+				if (String.Equals(commands[word],1) ) {
 					buildWord = word;
 					tempCommand.Add (word);
 				}
-				if (String.Equals(commands[word],2) /*&& (processState == 2)*/) {
+				if (String.Equals(commands[word],2) ) {
 					//if (!(String.Equals(tempCommand[tempCommand.Count - 1], buildWord))) //sprawdzić czy tempCommand.Count - 1 > 0
 					//	tempCommand.Add (buildWord); // jeśli ostatnie słowo nie jest buildWord to dodaje buildWord przed word
 					tempCommand.Add (word);
@@ -128,37 +156,35 @@ public class textScript : MonoBehaviour {
 			}
 		} 
    		if (no) {
-			commandList.RemoveRange(0, 3);
+            if (containsDirection(commandList[1]))
+			    commandList.RemoveRange(0, 3);
+            else
+                commandList.RemoveRange(0, 2);
 		}
                 
       
         if (!specialCommand) {
-            swap(tempCommand);
+            swap(ref tempCommand);
 		    commandList.InsertRange(commandList.Count, tempCommand); // wstawia na koniec
         }	
-        specialCommand = false;
-		constructions = false;
-		directions = false;
 		if (commandList.Count == 0)
 			return "pusta"; //lista pusta lub zła komenda
 		else
 			return "poprawna"; // command list zawiera jakieś poprawne słowa
 	}
-	void swap(List<string> list) { //uproszoczny swap
-		if ( (commandList.Count > 2) && (String.Equals(commands[commandList[1]],3)) 
-		&& (String.Equals(commands[commandList[2]],2)) ) {
+	void swap(ref List<string> list) { //uproszoczny swap
+		if ( (list.Count > 2) && (String.Equals(commands[list[1]],3)) 
+		&& (String.Equals(commands[list[2]],2)) ) {
 			string temp;
-			temp = commandList[1];
-			commandList[1] = commandList[2];
-			commandList[2] = temp;
+			temp = list[1];
+			list[1] = list[2];
+			list[2] = temp;
 		}    
 	}
 
 //-----------------------------------------------------------------fork-------------------------------------------
 
 	void fork() {
-		Debug.Log ("jestem w fork");
-		Debug.Log("slowo 1 = "+commandList[0]);
 
         if ( commandList.Count > 0 && String.Equals(commandList[0], "go") ) {
   			go();
@@ -177,7 +203,7 @@ public class textScript : MonoBehaviour {
 		else if ( commandList.Count > 0 && String.Equals(commandList[0], "clear") ){
 			destroy();
   		}
-		else{
+		else {
 			output = "\n[robot}> I don't understand you. Can you rephrase?";
 			commandList.RemoveRange(0, commandList.Count);
 		}
@@ -190,10 +216,10 @@ public class textScript : MonoBehaviour {
 		if ( (String.Equals (hitColliderName("north"), "bank")) || (String.Equals (hitColliderName("south"), "bank")) ||
 			(String.Equals (hitColliderName("east"), "bank")) || (String.Equals (hitColliderName("west"), "bank")) ) {
 			//jesli ma wystarczajaco pieniedzy
-			if (Money.money > 299)
+			if (DisplayMoneyInstantion.money > 299)
 				output += "\n[robot]> You have enough! Don't be greedy!";
 			else{
-				Money.money = Money.money + 100;
+				DisplayMoneyInstantion.money = DisplayMoneyInstantion.money + 100;
 				output += "\n[robot]> I've withdrawn $100 for you.";
 			}
 		}
@@ -216,11 +242,11 @@ public class textScript : MonoBehaviour {
 			//Debug.Log("jestem w up");
 			if ( hitCollider("north")==false ) {//jesli nic nie stoi na przeszkodzie
 				//Debug.Log("czysto");
-				rigidbody2D.transform.position += new Vector3 (0, i, 0) /* Time.deltaTime*/;
-			}
+                rigidbody2D.transform.position += new Vector3 (0, i, 0); /* Time.deltaTime*/   
+		    }
 			else {
 				//Debug.Log("przesszkoda!");
-				output +=  "You can't go in this direction. The "+(hitColliderName("north"))+" is there." ;
+                output +=  "\n[robot]> You can't go in this direction. The "+(hitColliderName("north"))+" is there." ;
 			}
 			commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
 			return 0;
@@ -278,13 +304,13 @@ public class textScript : MonoBehaviour {
 
 
 	void offerHouse(){
-		if ( Money.money < shedMoney ) //nie ma na nic pieniedzy
+		if ( DisplayMoneyInstantion.money < shedMoney ) //nie ma na nic pieniedzy
 			output += "\n[robot]> You don't have money for any construction. You have to go to the bank and withdraw the money.";
 		
-		if ( Money.money >= villaMoney )
+		if ( DisplayMoneyInstantion.money >= villaMoney )
 			output += "\n[robot]> You can build a villa, a house or a shed there. Which one do you choose?";
 		
-		if ( Money.money >= houseMoney )
+		if ( DisplayMoneyInstantion.money >= houseMoney )
 			output += "\n[robot]> You can build a house or a shed. Which one do you choose?";
 		else
 			output += "\n[robot]> You can build only a shed.";
@@ -304,10 +330,9 @@ public class textScript : MonoBehaviour {
 	//GDZIE BUDUJE
 		
 	void build(){
-		if (containsDirection (commandList [1])) {   //jesli podal kierunek
-		
-			x = 0;
-			y = 0;
+        x = 0;
+        y = 0;
+		if (commandList.Count > 1 && containsDirection (commandList [1])) {   //jesli podal kierunek
 			if (String.Equals (commandList [1], "north"))
 					y = i;
 			if (String.Equals (commandList [1], "south"))
@@ -319,7 +344,7 @@ public class textScript : MonoBehaviour {
 
 			//jesli tam jest trawa to buduj
 			if (String.Equals (hitColliderName (commandList [1]), "grass")) 
-				construct (x, y);
+				construct ();
 
 			else {//podal zly kierunek - tam cos jest
 				if (containsNietBud (commandList [1]))
@@ -364,7 +389,7 @@ public class textScript : MonoBehaviour {
 		if ( String.Equals(N,"") && String.Equals(E,"") && String.Equals(W,"") && String.Equals(S,"") ) //nigdzie nie ma trawy
 			output += "\n[robot]> There is no ground you can build on. you have to either move or clear the area.";
 
-		else{//gdzies jest trawa
+		else {//gdzies jest trawa
 			output += "\n[robot]> If you want you can build in the "+N+" "+S+" "+E+" "+W+".\nIf so choose a direction, if not just say 'no'.";
 			specialCommand=true;//z kierunkiem
 			directions=true;
@@ -379,14 +404,14 @@ public class textScript : MonoBehaviour {
 	
 	//CO BUDUJE
 		
-	void construct(int x, int y){
+	void construct(){
 		//jesli nie podal co ma zbudowac
 		if ( !containsBuilding(commandList[2]) )
 			offerHouse();
 			
 		else { //jesli podal co ma zbudowac
 			if ( String.Equals(commandList[2], "shed") ){
-				if ( Money.money < shedMoney ){
+				if ( DisplayMoneyInstantion.money < shedMoney ){
 					output += "\n[robot]> You don't have enough money";
 					offerHouse();
 				}
@@ -395,7 +420,7 @@ public class textScript : MonoBehaviour {
 			}
 
 			if ( String.Equals(commandList[2], "house") ){
-				if ( Money.money < shedMoney ){
+				if ( DisplayMoneyInstantion.money < shedMoney ){
 					output += "\n[robot]> You don't have enough money";
 					offerHouse();
 				}
@@ -404,7 +429,7 @@ public class textScript : MonoBehaviour {
 			}
 
 			if ( String.Equals(commandList[2], "villa") ){
-				if ( Money.money < shedMoney ){
+				if ( DisplayMoneyInstantion.money < shedMoney ){
 					output += "\n[robot]> You don't have enough money";
 					offerHouse();
 				}
@@ -470,6 +495,8 @@ public class textScript : MonoBehaviour {
 			return true;
 		if ( (String.Equals(slowo, "bank")) )
 			return true;
+        if ( (String.Equals(slowo, "warehouse")) )
+            return true;
 		return false;
 	}
 
@@ -728,8 +755,10 @@ public class textScript : MonoBehaviour {
 
 	}	
 
-
 }
+
+
+
 
 
 

@@ -8,8 +8,7 @@ public class DisplayMoney : MonoBehaviour {
     public int money;
     // Use this for initialization
     void Start () {
-        money = 100;
-      
+        moneytext = GetComponent<Text> ();  
     }
 
     // Update is called once per frame
