@@ -21,10 +21,11 @@ public class textScript : MonoBehaviour {
 	private int shedMoney = 25;
 	private int houseMoney = 50;
 	private int villaMoney = 75;
-	private bool no=false, constructions=false, directions=false;
+    private bool no=false, constructions=false, directions=false, question=false;
     public GameObject obj; //txt 
     private DisplayMoney DisplayMoneyInstantion;
 	private string[] randomAnswers = new string[10];
+    System.Random rnd = new System.Random();
 
 	void OnSubmit(string line) {
 		string commandLog;
@@ -37,12 +38,15 @@ public class textScript : MonoBehaviour {
         constructions = false;
         directions = false;
 		if (String.Equals(commandLog, "pusta"))
-      {
-            if (!no)
-                output += "\n[robot]> I don't understand you.";
-            else {
-                output += "\n[robot]> Ok.";
-                no = false;
+        {
+            if (question = false) {
+                if (!no)
+                    output += "\n[robot]> I don't understand you.";
+                else {
+                    output += "\n[robot]> Ok.";
+                    no = false;
+                }
+                question = true;
             }
       } else
         { 
@@ -85,26 +89,22 @@ public class textScript : MonoBehaviour {
 		commands.Add("west", 2);
 		commands.Add("no",0);
 
-
 		randomAnswers[0] = "\n[robot]> Sorry, I don't know.";
-		randomAnswers[0] = "\n[robot]> That's a hard question.";
-		randomAnswers[0] = "\n[robot]> Why do you ask?";
-		randomAnswers[0] = "\n[robot]> It's a secret.";
-		randomAnswers[0] = "\n[robot]> I'm too busy to answer right now.";
-		randomAnswers[0] = "\n[robot]> You're too young to know.";
-		randomAnswers[0] = "\n[robot]> Do not ask me SUCH questions!";
-		randomAnswers[0] = "\n[robot]> I forgot.";
-		randomAnswers[0] = "\n[robot]> If I charged you $1 for each question, would you still be asking?";
-		randomAnswers[0] = "\n[robot]> 42";
-
+		randomAnswers[1] = "\n[robot]> That's a hard question.";
+		randomAnswers[2] = "\n[robot]> Why do you ask?";
+		randomAnswers[3] = "\n[robot]> It's a secret.";
+		randomAnswers[4] = "\n[robot]> I'm too busy to answer right now.";
+		randomAnswers[5] = "\n[robot]> You're too young to know.";
+		randomAnswers[6] = "\n[robot]> Do not ask me SUCH questions!";
+		randomAnswers[7] = "\n[robot]> I forgot.";
+		randomAnswers[8] = "\n[robot]> If I charged you $1 for each question, would you still be asking?";
+		randomAnswers[9] = "\n[robot]> 42";
 	}
-
-
 
    
     // Use this for initialization
     void Start () {
-      DisplayMoneyInstantion = (DisplayMoney)obj.GetComponent (typeof(DisplayMoney));
+        DisplayMoneyInstantion = (DisplayMoney)obj.GetComponent (typeof(DisplayMoney));
       //Debug.Log(DisplayMoneyInstantion.money);
       //objCash = GetComponent<Text> ();
       //Debug.Log (textScriptInstantion.output);
@@ -116,60 +116,74 @@ public class textScript : MonoBehaviour {
 		string[] words = command.Split(new Char [] {' ', ',', '.', ':', '\t', '?', '!' }); // wyrzucić "?"
 		List<string> tempCommand = new List<string>();
 		string buildWord = "";
+		int insertAt = 0;
+        int randomNr = rnd.Next(1,10);
 		//posortować stringa
-		foreach (var word in words) {
-			//if  exists word < processState break i powiedz jestem w trakcie wykonywania polecenia nie mogę zbudować/ zburzyć 
-			//robot powtarza jeszcze raz czego potrzebuje
-			if (commands.ContainsValue(commands[word])) {
-				if (String.Equals(commands[word],1) ) {
-					buildWord = word;
-					tempCommand.Add (word);
-				}
-				if (String.Equals(commands[word],2) ) {
-					//if (!(String.Equals(tempCommand[tempCommand.Count - 1], buildWord))) //sprawdzić czy tempCommand.Count - 1 > 0
-					//	tempCommand.Add (buildWord); // jeśli ostatnie słowo nie jest buildWord to dodaje buildWord przed word
-					tempCommand.Add (word);
-				}
-				if (String.Equals(commands[word],3))  {
-					tempCommand.Add (word);
-				}
-				if (String.Equals(word,"no"))  {
-					no = true;
-				}
+        if ( command.Contains("?") ) {
+            output += randomAnswers[randomNr];
+            question = true;
+        }
+        else {
+    		foreach (var word in words) {
+    			//if  exists word < processState break i powiedz jestem w trakcie wykonywania polecenia nie mogę zbudować/ zburzyć 
+    			//robot powtarza jeszcze raz czego potrzebuje
+                
+    			if (commands.ContainsValue(commands[word])) {
+    				if (String.Equals(commands[word],1) ) {
+    					buildWord = word;
+    					tempCommand.Add (word);
+    				}
+    				if (String.Equals(commands[word],2) ) {
+    					//if (!(String.Equals(tempCommand[tempCommand.Count - 1], buildWord))) //sprawdzić czy tempCommand.Count - 1 > 0
+    					//	tempCommand.Add (buildWord); // jeśli ostatnie słowo nie jest buildWord to dodaje buildWord przed word
+    					tempCommand.Add (word);
+    				}
+    				if (String.Equals(commands[word],3))  {
+    					tempCommand.Add (word);
+    				}
+    				if (String.Equals(word,"no"))  {
+    					no = true;
+    				}
 
-                //odpowiedź użytkownika na zadanie pytania 
-                if (specialCommand) {
-                    //sprawdza czy podal kierunek do funkcji destroy
-                    if ( (String.Equals(commandList[0],"destroy") || (String.Equals(commandList[0],"clear"))) && containsDirection(word)) { 
-                        commandList.Insert(1,word); // wciska kierunek na commanList[1]
-                        
+                    //odpowiedź użytkownika na zadanie pytania 
+                    if (specialCommand) {
+                        //sprawdza czy podal kierunek do funkcji destroy
+                        if ( (String.Equals(commandList[0],"destroy") || (String.Equals(commandList[0],"clear"))) && containsDirection(word)) { 
+                            commandList.Insert(1,word); // wciska kierunek na commanList[1]
+    						if (commandList.Count > 2 && String.Equals(commands[commandList[2]],3))
+    							insertAt = 3;
+    						else 
+    							insertAt = 2; // do wstawienie pozostałej komendy
+                        }
+
+
+    					//pytanie: do you want to build ..
+    					//odp: I don't want to build a shed
+    					//to wcisnie do listy
+    					//a potem, skoro no==true to usunie komende
+
+    					//zapytanie o kierunek
+    					if (String.Equals(commandList[0],"build") && (directions) && (containsDirection(word)) ) {
+
+    						insertAt = 3;
+    						if ( commandList.Count > 1 && containsDirection(commandList[1]) )//jesli byl tam stary kierunek
+    							commandList[1]=word;
+    						else
+    							commandList.Insert(1,word); //wsadz kierunek na commandList[1]
+    					}
+    					//zapytanie o budynek
+    					if (String.Equals(commandList[0],"build") && (constructions) && (containsBuilding(word)) ) {	
+    						if ( commandList.Count>2 && containsBuilding(commandList[2]) )//jesli byl tam stary budynek
+    							commandList[2] = word; // czemu [1]
+    						else {
+    							commandList.Insert(2,word); //wsadz budynek na commandList[2]
+    						}
+                            insertAt = 3;
+                        }
                     }
-
-
-					//pytanie: do you want to build ..
-					//odp: I don't want to build a shed
-					//to wcisnie do listy
-					//a potem, skoro no==true to usunie komende
-
-					//zapytanie o kierunek
-					if (String.Equals(commandList[0],"build") && (directions) && (containsDirection(word)) ) {
-
-					 
-						if ( containsDirection(commandList[1]) )//jesli byl tam stary kierunek
-							commandList[1]=word;
-						else
-							commandList.Insert(1,word); //wsadz kierunek na commandList[1]
-					}
-					//zapytanie o budynek
-					if (String.Equals(commandList[0],"build") && (constructions) && (containsBuilding(word)) ) {	
-						if ( commandList.Count>2 && containsBuilding(commandList[2]) )//jesli byl tam stary budynek
-							commandList[1]=word;
-						else
-							commandList.Insert(2,word); //wsadz budynek na commandList[2]
-                    }
-                }
-			}
-		} 
+    			}
+    		}
+        }
    		if (no) {
 			if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
 			    commandList.RemoveRange(0, 3);
