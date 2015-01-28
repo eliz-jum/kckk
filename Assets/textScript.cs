@@ -142,6 +142,7 @@ public class textScript : MonoBehaviour {
                     //sprawdza czy podal kierunek do funkcji destroy
                     if ( (String.Equals(commandList[0],"destroy") || (String.Equals(commandList[0],"clear"))) && containsDirection(word)) { 
                         commandList.Insert(1,word); // wciska kierunek na commanList[1]
+                        
                     }
 
 
@@ -187,13 +188,15 @@ public class textScript : MonoBehaviour {
 			return "poprawna"; // command list zawiera jakieś poprawne słowa
 	}
 	void swap(ref List<string> list) { //uproszoczny swap
-		if ( (list.Count > 2) && (String.Equals(commands[list[1]],3)) 
-		&& (String.Equals(commands[list[2]],2)) ) {
-			string temp;
-			temp = list[1];
-			list[1] = list[2];
-			list[2] = temp;
-		}    
+        string temp;
+        for(int i = 0; i < list.Count; i++) {
+      		if ( (list.Count > i + 2) && (String.Equals(commands[list[i+1]],3)) 
+      		&& (String.Equals(commands[list[i+2]],2)) ) {
+      			temp = list[i+1];
+      			list[i+1] = list[i+2];
+      			list[i+2] = temp;
+      		}
+        }
 	}
 
 //-----------------------------------------------------------------fork-------------------------------------------
@@ -366,7 +369,7 @@ public class textScript : MonoBehaviour {
 			//jesli tam jest trawa to buduj
 			if (String.Equals (hitColliderName (commandList [1]), "grass")) 
 				construct ();
-			else if (!(hitCollider (commandList [1]))){
+			else if (!(hitCollider (commandList [1]))) {
 				output += "\n[robot]> You mustn't build on the road!";
 				if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
 					commandList.RemoveRange(0, 3);
