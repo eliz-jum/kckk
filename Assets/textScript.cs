@@ -39,9 +39,9 @@ public class textScript : MonoBehaviour {
         directions = false;
 		if (String.Equals(commandLog, "pusta"))
         {
-			Debug.Log("jestem w pusta");
+			//Debug.Log("jestem w pusta");
             if (question == false) {
-				Debug.Log("jestem questions false");
+				//Debug.Log("jestem questions false");
                 if (!no)
                     output += "\n[robot]> I don't understand you.";
                 else {
@@ -178,8 +178,8 @@ public class textScript : MonoBehaviour {
     						}
                         }
 						//go kierunek
-						if (String.Equals(commandList[0],"go") && (containsDirection(word)) ) {	
-							Debug.Log("wstawiam kierunek do go");
+						if (String.Equals(commandList[0],"go") && (containsDirectionGo(word)) ) {	
+							//Debug.Log("wstawiam kierunek do go");
 							commandList.Insert(1,word);
 
 						}
@@ -514,18 +514,24 @@ public class textScript : MonoBehaviour {
 			offerHouse();
 		}	
 	}	
-			
-
-
-		
-		
-		
-
-		
 
 
 
 
+
+
+
+	bool containsDirectionGo(string slowo) {
+		if (String.Equals(slowo, "up"))
+			return true;
+		if (String.Equals(slowo, "down"))
+			return true;
+		if (String.Equals(slowo, "left"))
+			return true;
+		if (String.Equals(slowo, "right"))
+			return true;
+		return false;
+	}
 	bool containsDirection(string slowo) {
 		if (String.Equals(slowo, "north"))
 			return true;
