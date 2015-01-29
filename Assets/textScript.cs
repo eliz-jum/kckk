@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class textScript : MonoBehaviour {
 	public InputField userInput;
 	public Text roboTalk;
-	public string output="\nWhat do you want me to do?";
+	public string output = "\nWhat do you want me to do?";
 	private string commandText, roboText = "";
 	private int processState;
 	public List<string> wholeCommand = new List<string>();
@@ -110,6 +110,7 @@ public class textScript : MonoBehaviour {
     // Use this for initialization
     void Start () {
         DisplayMoneyInstantion = (DisplayMoney)obj.GetComponent (typeof(DisplayMoney));
+		output = "[robot]> What do you want me to do?";
       //Debug.Log(DisplayMoneyInstantion.money);
       //objCash = GetComponent<Text> ();
       //Debug.Log (textScriptInstantion.output);
@@ -216,7 +217,7 @@ public class textScript : MonoBehaviour {
    		if (no) {
 			//Debug.Log("jestem w no");
 			//do go
-			if ( String.Equals(commandList[0], "go") ){
+			if (commandList.Count>1 && String.Equals(commandList[0], "go") ){
 				if (commandList.Count>1)
 					commandList.RemoveRange(0,2);
 				else
@@ -229,7 +230,7 @@ public class textScript : MonoBehaviour {
 				else if (commandList.Count>1)
 	                commandList.RemoveRange(0, 2);
 				else{
-					//Debug.Log("usowam destroy");
+					//Debug.Log("uswam destroy");
 					commandList.RemoveRange(0, 1);
 				}
 			}
@@ -423,7 +424,7 @@ public class textScript : MonoBehaviour {
 			if (String.Equals (hitColliderName (commandList [1]), "grass")) 
 				construct ();
 			else if (!(hitCollider (commandList [1]))) {
-				output += "\n[robot]> I mustn't build on the road!";
+				output += "\n[robot]> You mustn't build on the road!";
 				if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
 					commandList.RemoveRange(0, 3);
 				else
@@ -431,7 +432,7 @@ public class textScript : MonoBehaviour {
 			}
 			else {//podal zly kierunek - tam cos jest
 				if (containsNietBud (hitColliderName(commandList[1])) )
-					output += "\n[robot]> I mustn't destroy city's property!";
+					output += "\n[robot]> You mustn't destroy city's property!";
 				else
 					output += "\n[robot]> First I have to get rid of " + hitColliderName (commandList [1]) + ".";
  
@@ -695,7 +696,7 @@ public class textScript : MonoBehaviour {
 										return 0;
 								} else { //w tym kierunku jest cos innego
 										// np na gorze jest home a on pisze "Destroy shed in the north."
-										output += "\n[robot]> You can't destroy the " + commandList [2]; //You can't destroy a shed
+										output += "\n[robot]> I can't destroy the " + commandList [2]; //You can't destroy a shed
 										output += "\nIn the " + commandList [1] + " there is/are the " + hitColliderName (commandList [1]); //in the north there is a home.
 										if (!hitCollider (commandList [1]))
 												output += "road.";
@@ -715,7 +716,7 @@ public class textScript : MonoBehaviour {
 										commandList.RemoveRange (0, 3); //USUN jedną KOMENDĘ
 										return 0;
 								} else {
-										output += "\n[robot]> You can't clear " + commandList [2]; 
+										output += "\n[robot]> I can't clear " + commandList [2]; 
 										output += "\n[robot]> In the " + commandList [1] + " there is the " + hitColliderName (commandList [1]);
 										if (!hitCollider (commandList [1]))
 												output += "road.";
@@ -842,7 +843,7 @@ public class textScript : MonoBehaviour {
 								}
 						} else { //jesli wiecej niz 1 jest prawdziwe
 
-								output += "\n[robot]> You can destroy a " + commandList [1] + " in the " + N + " " + S + " " + E + " " + W + ". Which one do you choose?";
+								output += "\n[robot]> I can destroy a " + commandList [1] + " in the " + N + " " + S + " " + E + " " + W + ". Which one do you choose?";
 				
 
 								//specjalna komenda

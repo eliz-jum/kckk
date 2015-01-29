@@ -107,7 +107,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 9, y: -.00185394287}
-  m_SizeDelta: {x: 199.944366, y: 1199.90369}
+  m_SizeDelta: {x: 257, y: 1199.90369}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &11732257
 MonoBehaviour:
@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: .1953125, g: .1953125, b: .1953125, a: 1}
+  m_Color: {r: .192156866, g: .031649366, b: .0692054704, a: 1}
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 13
@@ -134,25 +134,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Love Is A Burning Think\r\nAnd It Makes A Firery Ring\r\nBound By Wild
-    Desire\r\nI Fell Into A Ring Of Fire\r\n\r\nref. 2x\r\nI Fell Into A Burning Ring
-    Of Fire\r\nI Went Down, Down, Down\r\nAnd The Flames Went Higher\r\n\r\nAnd It
-    Burns, Burns, Burns\r\nThe Ring Of Fire\r\nThe Ring Of Fire\r\n\r\n\r\nThe Taste
-    Of Love Is Sweet\r\nWhen Hearts Like Our's Meet\r\nI Fell For You Like A Child\r\nOh,
-    But The Fire Went Wild\r\n\r\n\r\nref. 2x\n\nYou can't judge an apple by looking
-    at a tree \r\nYou can't judge honey by looking at the bee \r\nYou can't judge
-    a daughter by looking at the mother \r\nYou can't judge a book by looking at the
-    cover \r\nOh can't you see, oh you misjudge me \r\nI look like a farmer, but I'm
-    a lover \r\nYou can't judge a book by looking at the cover\r\nHoney!\r\n\r\nYou
-    can't judge sugar by looking at the cane \r\nYou can't judge a woman by looking
-    at her man \r\nYou can't judge a sister by looking at her brother \r\nYou can't
-    judge a book by looking at the cover \r\nOh can't you see, oh you misjudge me
-    \r\nI look like a farmer, but I'm a Lover \r\nYou can't judge a book by looking
-    at the cover \r\nYou can't judge a fish by lookin' in the pond \r\nYou can't judge
-    right from looking at the wrong \r\nYou can't judge one by looking at the other
-    \r\nYou can't judge a book by looking at the cover \r\nOh can't you see, oh you
-    misjudge me \r\nI look like a farmer, but I'm a lover \r\nYou can't judge a book
-    by looking at the cover!"
+  m_Text: Prepare yourself!
 --- !u!222 &11732258
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -270,7 +252,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: .443137258, g: .505882382, b: .611764729, a: 1}
+  m_Color: {r: .58431375, g: .454901963, b: .486274511, a: 1}
   m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
@@ -1356,7 +1338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: .192156866, g: .031649366, b: .0692054704, a: 1}
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 20
@@ -1482,11 +1464,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: .195999995, g: .195999995, b: .195999995, a: 1}
+  m_Color: {r: .308823526, g: .0931012034, b: .143576667, a: 1}
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 14
-    m_FontStyle: 0
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
@@ -1933,7 +1915,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
+  m_BackGroundColor: {r: .426470578, g: .213235289, b: .262048185, a: .31764707}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
