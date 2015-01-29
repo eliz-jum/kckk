@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class textScript : MonoBehaviour {
 	public InputField userInput;
 	public Text roboTalk;
-	public string output="\nCzekam na polecenia.";
+	public string output="\nWhat do you want me to do?";
 	private string commandText, roboText = "";
 	private int processState;
 	public List<string> wholeCommand = new List<string>();
@@ -39,7 +39,9 @@ public class textScript : MonoBehaviour {
         directions = false;
 		if (String.Equals(commandLog, "pusta"))
         {
-            if (question = false) {
+			Debug.Log("jestem w pusta");
+            if (question == false) {
+				Debug.Log("jestem questions false");
                 if (!no)
                     output += "\n[robot]> I don't understand you.";
                 else {
@@ -48,7 +50,8 @@ public class textScript : MonoBehaviour {
                 }
                 question = true;
             }
-      } else
+		} 
+		else
         { 
           no = false;
           fork();
@@ -88,6 +91,8 @@ public class textScript : MonoBehaviour {
 		commands.Add("east",2);
 		commands.Add("west", 2);
 		commands.Add("no",0);
+	//	commands.Add("dont't",0);
+	//	commands.Add("Don't",0);
 
 		randomAnswers[0] = "\n[robot]> Sorry, I don't know.";
 		randomAnswers[1] = "\n[robot]> That's a hard question.";
@@ -120,6 +125,7 @@ public class textScript : MonoBehaviour {
         int randomNr = rnd.Next(1,10);
 		//posortować stringa
         if ( command.Contains("?") ) {
+			//if (
             output += randomAnswers[randomNr];
             question = true;
         }
@@ -144,51 +150,63 @@ public class textScript : MonoBehaviour {
     				if (String.Equals(word,"no"))  {
     					no = true;
     				}
+			//		if (String.Equals(word,"don't") || String.Equals(word,"Don't") )  {
+						
+			//		}
 
                     //odpowiedź użytkownika na zadanie pytania 
                     if (specialCommand) {
                         //sprawdza czy podal kierunek do funkcji destroy
-                        if ( (String.Equals(commandList[0],"destroy") || (String.Equals(commandList[0],"clear"))) && containsDirection(word)) { 
+                        if ( (String.Equals(commandList[0],"destroy") || (String.Equals(commandList[0],"clear"))) && containsDirection(word))
                             commandList.Insert(1,word); // wciska kierunek na commanList[1]
-    						if (commandList.Count > 2 && String.Equals(commands[commandList[2]],3))
-    							insertAt = 3;
-    						else 
-    							insertAt = 2; // do wstawienie pozostałej komendy
-                        }
+    						
+                        
 
-
-    					//pytanie: do you want to build ..
-    					//odp: I don't want to build a shed
-    					//to wcisnie do listy
-    					//a potem, skoro no==true to usunie komende
-
-    					//zapytanie o kierunek
+						//build kierunek
     					if (String.Equals(commandList[0],"build") && (directions) && (containsDirection(word)) ) {
-
-    						insertAt = 3;
     						if ( commandList.Count > 1 && containsDirection(commandList[1]) )//jesli byl tam stary kierunek
     							commandList[1]=word;
     						else
     							commandList.Insert(1,word); //wsadz kierunek na commandList[1]
     					}
-    					//zapytanie o budynek
+    					//build budynek
     					if (String.Equals(commandList[0],"build") && (constructions) && (containsBuilding(word)) ) {	
     						if ( commandList.Count>2 && containsBuilding(commandList[2]) )//jesli byl tam stary budynek
-    							commandList[2] = word; // czemu [1]
+    							commandList[2] = word;
     						else {
     							commandList.Insert(2,word); //wsadz budynek na commandList[2]
     						}
-                            insertAt = 3;
                         }
+						//go kierunek
+						if (String.Equals(commandList[0],"go") && (containsDirection(word)) ) {	
+							Debug.Log("wstawiam kierunek do go");
+							commandList.Insert(1,word);
+
+						}
                     }
     			}
     		}
         }
    		if (no) {
-			if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
-			    commandList.RemoveRange(0, 3);
-            else
-                commandList.RemoveRange(0, 2);
+			//Debug.Log("jestem w no");
+			//do go
+			if ( String.Equals(commandList[0], "go") ){
+				if (commandList.Count>1)
+					commandList.RemoveRange(0,2);
+				else
+					commandList.RemoveRange(0,1);
+			}
+			//do destroy	clear	build
+			else{
+				if (commandList.Count>2 && containsDirection(commandList[1]) && containsBuilding(commandList[2]))
+				    commandList.RemoveRange(0, 3);
+				else if (commandList.Count>1)
+	                commandList.RemoveRange(0, 2);
+				else{
+					//Debug.Log("usowam destroy");
+					commandList.RemoveRange(0, 1);
+				}
+			}
 		}
                 
       
@@ -268,64 +286,59 @@ public class textScript : MonoBehaviour {
 		//Debug.Log(commandList [2]);
 		// jeśli podał kierunek
 		int isDirection = 0;
-		//Debug.Log("sprawdzam up");
-		if ( commandList.Count > 1 && String.Equals(commandList[1],"up") ) {
-			isDirection=1;
-			//Debug.Log("jestem w up");
-			if ( hitCollider("north")==false ) {//jesli nic nie stoi na przeszkodzie
+		//jesli podal kierunek
+
+		if (commandList.Count > 1 && String.Equals (commandList [1], "up")) {
+			if (hitCollider ("north") == false) {//jesli nic nie stoi na przeszkodzie
 				//Debug.Log("czysto");
-                rigidbody2D.transform.position += new Vector3 (0, i, 0); /* Time.deltaTime*/   
-		    }
-			else {
+				rigidbody2D.transform.position += new Vector3 (0, i, 0); /* Time.deltaTime*/   
+			} else {
 				//Debug.Log("przesszkoda!");
-                output +=  "\n[robot]> You can't go in this direction. The "+(hitColliderName("north"))+" is there." ;
+				output += "\n[robot]> You can't go in this direction. The " + (hitColliderName ("north")) + " is there.";
+				//NIE SPRAWDZA GDZIE MOZE ISC, nie PYTA gdzie moze
 			}
-			commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
+			isDirection=1;
+			commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
 			return 0;
 		}
-	///JESLI NIE PODA SIE KIERUNKU CZYLI SAMO "GO" ON SIE WYSYPUJE NA SPRAWDZANIU UP I KAPUT		CZEMU?????
-			//Debug.Log("sprawdzam down");
-		if ( commandList.Count > 1 && String.Equals(commandList[1],"down") ) {
-				isDirection=1;
-				if ( hitCollider("south")==false ) {
+
+
+		if (commandList.Count > 1 && String.Equals (commandList [1], "down")) {
+			if (hitCollider ("south") == false) {
 					rigidbody2D.transform.position += new Vector3 (0, -i, 0);
-				}
-				else {
-					output += "\n[robot]> You can't go in this direction. The "+hitColliderName("south")+" is there." ;
-				}
-			commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-			return 0;
-		}
-		if ( commandList.Count > 1 && String.Equals(commandList[1],"right") ) {
+			} else {
+					output += "\n[robot]> You can't go in this direction. The " + hitColliderName ("south") + " is there.";
+			}
 			isDirection=1;
-			if ( hitCollider("east")==false ) {
-				//Debug.Log("czysto");
-				rigidbody2D.transform.position += new Vector3 (i, 0, 0);
-			}
-			else {
-				output += "\n[robot]> You can't go in this direction. The "+hitColliderName("east")+" is there." ;
-			}
-			commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
+			commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
 			return 0;
 		}
-
-		if ( commandList.Count > 1 && String.Equals(commandList[1],"left") ) {
+		if (commandList.Count > 1 && String.Equals (commandList [1], "right")) {
+			if (hitCollider ("east") == false) {
+					//Debug.Log("czysto");
+					rigidbody2D.transform.position += new Vector3 (i, 0, 0);
+			} else {
+					output += "\n[robot]> You can't go in this direction. The " + hitColliderName ("east") + " is there.";
+			}
 			isDirection=1;
-			if ( hitCollider("west")==false ) {
-				rigidbody2D.transform.position += new Vector3 (-i, 0, 0);
-			}
-			else{
-				output += "\n[robot]> You can't go in this direction. The "+hitColliderName("west")+" is there." ;
-			}
-			commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
+			commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
 			return 0;
 		}
 
+		if (commandList.Count > 1 && String.Equals (commandList [1], "left")) {
+			if (hitCollider ("west") == false) {
+					rigidbody2D.transform.position += new Vector3 (-i, 0, 0);
+			} else {
+					output += "\n[robot]> You can't go in this direction. The " + hitColliderName ("west") + " is there.";
+			}
+			isDirection=1;
+			commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+			return 0;
+		}
 
-		//jesli nie podal kierunku
-		if (isDirection==0) {
-			output += "\n[robot]> You didn't say where!";
-            commandList.RemoveRange(0,1);
+		if (isDirection==0){//jesli nie podal kierunku		
+			output += "\n[robot]> You didn't say where!\nIf you want, name your direction, if not just say no.";
+			specialCommand=true;
             return 0;
 		}
         return 0;
@@ -631,196 +644,191 @@ public class textScript : MonoBehaviour {
     	x=0;
     	y=0;
     		// destroy north house
-    	if (containsDirection(commandList[1])) { // jeśli podał kierunek
+    	if (commandList.Count > 1 && containsDirection (commandList [1])) { // jeśli podał kierunek
     			
-    	    if ( String.Equals(commandList[1],"north") )
-    			y=i;
-    		if ( String.Equals(commandList[1],"south") )
-    			y=-i;
-    		if ( String.Equals(commandList[1],"west") )
-    			x=-i;
-    		if ( String.Equals(commandList[1],"east") )
-    			x=i;	
-            //Debug.Log(commandList.Count);
-            if ( commandList.Count > 2 && ((containsBuilding(commandList[2])) || (String.Equals(commandList[2],"tree"))) )  { //jesli podal budynek lub drzewo
-    		    if ( (containsBuilding(hitColliderName(commandList[1]))) || (String.Equals(hitColliderName(commandList[1]),"tree")) ){//czy w kierunku ktory podal jest budynek/drzewo ktory podal
+						if (String.Equals (commandList [1], "north"))
+								y = i;
+						if (String.Equals (commandList [1], "south"))
+								y = -i;
+						if (String.Equals (commandList [1], "west"))
+								x = -i;
+						if (String.Equals (commandList [1], "east"))
+								x = i;	
+						//Debug.Log(commandList.Count);
+						if (commandList.Count > 2 && ((containsBuilding (commandList [2])) || (String.Equals (commandList [2], "tree")))) { //jesli podal budynek lub drzewo
+								if ((containsBuilding (hitColliderName (commandList [1]))) || (String.Equals (hitColliderName (commandList [1]), "tree"))) {//czy w kierunku ktory podal jest budynek/drzewo ktory podal
 
-    				matchRemains( commandList[2], commandList[1]);
-    				commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
-    				return 0;
-    			}
-    			else { //w tym kierunku jest cos innego
-    				// np na gorze jest home a on pisze "Destroy shed in the north."
-    				output += "\n[robot]> You can't destroy the "+commandList[2]; //You can't destroy a shed
-    				output += "\nIn the "+commandList[1]+" there is/are the "+hitColliderName(commandList[1]); //in the north there is a home.
-					if ( !hitCollider(commandList[1]) )
-						output += "road.";
-    				commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
-    				return 0;
+										matchRemains (commandList [2], commandList [1]);
+										commandList.RemoveRange (0, 3); //USUN jedną KOMENDĘ
+										return 0;
+								} else { //w tym kierunku jest cos innego
+										// np na gorze jest home a on pisze "Destroy shed in the north."
+										output += "\n[robot]> You can't destroy the " + commandList [2]; //You can't destroy a shed
+										output += "\nIn the " + commandList [1] + " there is/are the " + hitColliderName (commandList [1]); //in the north there is a home.
+										if (!hitCollider (commandList [1]))
+												output += "road.";
+										commandList.RemoveRange (0, 3); //USUN jedną KOMENDĘ
+										return 0;
     						
     						
-    			}
-    		}
-    			//jesli podal cokolwiek do clear
-            if ( commandList.Count > 2 && containsRemains(commandList[2]) ) { //podal co wyczyscic
+								}
+						}
+						//jesli podal cokolwiek do clear
+						if (commandList.Count > 2 && containsRemains (commandList [2])) { //podal co wyczyscic
     				 
-    				//hitColliderName dostaje kierunek zwraca nazwe collidera
-    				//containsRemains porownuje slowo dostane z ruins/ashes/trunks
-    			if (containsRemains(hitColliderName(commandList[1])) ){//czy w kierunku ktory podal jest pozostalosc ktora podal
-    				destroyPrefab(commandList[1]);
-    				commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
-    				return 0;
-    			}
-    			else {
-    				output += "\n[robot]> You can't clear "+commandList[2]; 
-    				output += "\n[robot]> In the "+commandList[1]+" there is the " + hitColliderName(commandList[1]);
-					if ( !hitCollider(commandList[1]) )
-						output += "road.";
-    				commandList.RemoveRange(0,3); //USUN jedną KOMENDĘ
-    				return 0;
-    			}
-    		}
-			
-			else { //jesli nie podal co usunac tylko kierunek
-				if (String.Equals ((hitColliderName(commandList[1])), "grass")) {
-					output += "\n[robot]> There is nothing to destroy.";
-					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-					return 0;
-				}
-				else if ( !hitCollider(commandList[1]) ) {
-					output += "\n[robot]> You mustn't destroy the road!";
-					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-					return 0;
-				}
-				else if (containsNietBud(hitColliderName(commandList[1])) ){
-					output += "\n[robot]> You mustn't destroy city's property!";
-					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-					return 0;
-				}
-				else if ( containsRemains(hitColliderName(commandList[1])) ){ //TO DO clear
-					destroyPrefab(commandList[1]);
-					output += "\n[robot]> I've cleared what you'd wanted me to.";
-					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-					return 0;
-				}
-				else {
-					matchRemains(hitColliderName(commandList[1]),commandList[1]);
-					commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-					return 0;
-				}
-			}
+								//hitColliderName dostaje kierunek zwraca nazwe collidera
+								//containsRemains porownuje slowo dostane z ruins/ashes/trunks
+								if (containsRemains (hitColliderName (commandList [1]))) {//czy w kierunku ktory podal jest pozostalosc ktora podal
+										destroyPrefab (commandList [1]);
+										commandList.RemoveRange (0, 3); //USUN jedną KOMENDĘ
+										return 0;
+								} else {
+										output += "\n[robot]> You can't clear " + commandList [2]; 
+										output += "\n[robot]> In the " + commandList [1] + " there is the " + hitColliderName (commandList [1]);
+										if (!hitCollider (commandList [1]))
+												output += "road.";
+										commandList.RemoveRange (0, 3); //USUN jedną KOMENDĘ
+										return 0;
+								}
+						} else { //jesli nie podal co usunac tylko kierunek
+								if (String.Equals ((hitColliderName (commandList [1])), "grass")) {
+										output += "\n[robot]> There is nothing to destroy.";
+										commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+										return 0;
+								} else if (!hitCollider (commandList [1])) {
+										output += "\n[robot]> You mustn't destroy the road!";
+										commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+										return 0;
+								} else if (containsNietBud (hitColliderName (commandList [1]))) {
+										output += "\n[robot]> You mustn't destroy city's property!";
+										commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+										return 0;
+								} else if (containsRemains (hitColliderName (commandList [1]))) { //TO DO clear
+										destroyPrefab (commandList [1]);
+										output += "\n[robot]> I've cleared what you'd wanted me to.";
+										commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+										return 0;
+								} else {
+										matchRemains (hitColliderName (commandList [1]), commandList [1]);
+										commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+										return 0;
+								}
+						}
 				
-		}
-		else { //jesli nie bylo kierunku musial napisac co zniszczyc
+				}
+		
+		//nie bylo kierunku ale napisal co zniszczyc
+		else if (commandList.Count > 1 && (containsNietBud (commandList [1]) || containsBuilding (commandList [1])
+						|| containsRemains (commandList [1]) || String.Equals (commandList [1], "tree") || String.Equals (commandList [1], "tree(Clone)"))) {
 
-			if (containsNietBud(commandList[1]) ){
-				output += "\n[robot]> You mustn't destroy city's property!";
-				commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-				return 0;
-			}
-			string N="";
-			string S="";
-			string E="";
-			string W="";
-			x=0;
-			y=0; 
+						if (containsNietBud (commandList [1])) {
+								output += "\n[robot]> You mustn't destroy city's property!";
+								commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+								return 0;
+						}
+						string N = "";
+						string S = "";
+						string E = "";
+						string W = "";
+						x = 0;
+						y = 0; 
 
 		    
-            if ( hitCollider("north") && hitColliderName("north").Contains(commandList[1]) ) { //jesli jest na polnocy to co chce skasowac
-				N="north";
-			}
-            if ( hitCollider("south") && hitColliderName("south").Contains(commandList[1]) ) {
-				S="south";
-			}
-            if ( hitCollider("east") && hitColliderName("east").Contains(commandList[1]) ) {
-				E="east";
-			}
-			if ( hitCollider("west") && hitColliderName("west").Contains(commandList[1]) ) {
-				W="west";
-			}
+						if (hitCollider ("north") && hitColliderName ("north").Contains (commandList [1])) { //jesli jest na polnocy to co chce skasowac
+								N = "north";
+						}
+						if (hitCollider ("south") && hitColliderName ("south").Contains (commandList [1])) {
+								S = "south";
+						}
+						if (hitCollider ("east") && hitColliderName ("east").Contains (commandList [1])) {
+								E = "east";
+						}
+						if (hitCollider ("west") && hitColliderName ("west").Contains (commandList [1])) {
+								W = "west";
+						}
 			
-			if ( String.Equals(N,"") && String.Equals(E,"") && String.Equals(W,"") && String.Equals(S,"") ){ //nic nie jest prawdziwe
-				output += "\n[robot]> The thing you are trying to destroy is not here.";
-				commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-				return 0;
-			}
-		    else if ( (N.Length + S.Length + W.Length + E.Length) < 6 ){ //tylko jedno prawdziwe
-				if ( String.Equals(N,"north") ) {//jesli cos jest na polnocy
-					y=i;
-					//clear
-					if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
-						destroyPrefab("north");
-						output += "\n[robot]> I've cleared "+commandList[1]+".";
-						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-						return 0;
-					}
-					else {
-						matchRemains( commandList[1],"north" );
-                        commandList.RemoveRange(0,2);
-                        return 0;  
-                    }
-				}
-				if ( String.Equals(S,"south") ) {//jesli cos jest na polnocy
-					y=-i;
-					//clear
-					if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
-						destroyPrefab("south");
-						output += "\n[robot]> I've cleared "+commandList[1]+".";
-						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-						return 0;
-					}
-					else {
-						matchRemains( commandList[1],"south" );
-                        commandList.RemoveRange(0,2);
-                        return 0;  
-                    }
-				}
-				if ( String.Equals(E,"east") ) {//jesli cos jest na polnocy
-					x=i;
-					//clear
-					if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
-						destroyPrefab("east");
-						output += "\n[robot]> I've cleared "+commandList[1]+".";
-						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-						return 0;
-					}
-					else {
-						matchRemains( commandList[1],"east" );
-                        commandList.RemoveRange(0,2);
-                        return 0;  
-                    }
-				}
-				if ( String.Equals(W,"west") ) {//jesli cos jest na polnocy
-					x=-i;
-					//clear
-					if ( containsRemains(commandList[1]) ){ //sprawdza czy to pieńki/popioły/ruiny
-						destroyPrefab("west");
-						output += "\n[robot]> I've cleared "+commandList[1]+".";
-						commandList.RemoveRange(0,2); //USUN jedną KOMENDĘ
-						return 0;
-					}
-					else {
-						matchRemains( commandList[1],"west" );
-                        commandList.RemoveRange(0,2);
-                        return 0;    
-                    } 
-                }
-            }
-			else { //jesli wiecej niz 1 jest prawdziwe
+						if (String.Equals (N, "") && String.Equals (E, "") && String.Equals (W, "") && String.Equals (S, "")) { //nic nie jest prawdziwe
+								output += "\n[robot]> The thing you are trying to destroy is not here.";
+								commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+								return 0;
+						} else if ((N.Length + S.Length + W.Length + E.Length) < 6) { //tylko jedno prawdziwe
+								if (String.Equals (N, "north")) {//jesli cos jest na polnocy
+										y = i;
+										//clear
+										if (containsRemains (commandList [1])) { //sprawdza czy to pieńki/popioły/ruiny
+												destroyPrefab ("north");
+												output += "\n[robot]> I've cleared " + commandList [1] + ".";
+												commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+												return 0;
+										} else {
+												matchRemains (commandList [1], "north");
+												commandList.RemoveRange (0, 2);
+												return 0;  
+										}
+								}
+								if (String.Equals (S, "south")) {//jesli cos jest na polnocy
+										y = -i;
+										//clear
+										if (containsRemains (commandList [1])) { //sprawdza czy to pieńki/popioły/ruiny
+												destroyPrefab ("south");
+												output += "\n[robot]> I've cleared " + commandList [1] + ".";
+												commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+												return 0;
+										} else {
+												matchRemains (commandList [1], "south");
+												commandList.RemoveRange (0, 2);
+												return 0;  
+										}
+								}
+								if (String.Equals (E, "east")) {//jesli cos jest na polnocy
+										x = i;
+										//clear
+										if (containsRemains (commandList [1])) { //sprawdza czy to pieńki/popioły/ruiny
+												destroyPrefab ("east");
+												output += "\n[robot]> I've cleared " + commandList [1] + ".";
+												commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+												return 0;
+										} else {
+												matchRemains (commandList [1], "east");
+												commandList.RemoveRange (0, 2);
+												return 0;  
+										}
+								}
+								if (String.Equals (W, "west")) {//jesli cos jest na polnocy
+										x = -i;
+										//clear
+										if (containsRemains (commandList [1])) { //sprawdza czy to pieńki/popioły/ruiny
+												destroyPrefab ("west");
+												output += "\n[robot]> I've cleared " + commandList [1] + ".";
+												commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
+												return 0;
+										} else {
+												matchRemains (commandList [1], "west");
+												commandList.RemoveRange (0, 2);
+												return 0;    
+										} 
+								}
+						} else { //jesli wiecej niz 1 jest prawdziwe
 
-				output += "\n[robot]> You can destroy a "+ commandList[1] +" in the "+N+" "+S+" "+E+" "+W+". Which one do you choose?";
+								output += "\n[robot]> You can destroy a " + commandList [1] + " in the " + N + " " + S + " " + E + " " + W + ". Which one do you choose?";
 				
 
-				//specjalna komenda
-				specialCommand = true;
-				return 0;
+								//specjalna komenda
+								specialCommand = true;
+								return 0;
 
-			    //z odpowiedzi uzytkownika wyciaga kierunek i wciska go na 2 miejsce commandList[1]
-				//potem wykonuje fork od nowa posiadajac juz cala komende
-				//jeśli nie podał kierunku to fork znowu to zweryfikuje
+								//z odpowiedzi uzytkownika wyciaga kierunek i wciska go na 2 miejsce commandList[1]
+								//potem wykonuje fork od nowa posiadajac juz cala komende
+								//jeśli nie podał kierunku to fork znowu to zweryfikuje
 
-			}
-			return 0;	
+						}
+						return 0;	
+				}
+		//nie podal kierunku ani co zniszczyc
+		else {
+			output += "\n[robot]> You didn't say in what direction. If you want, name your direction, if not just say no.";
+			specialCommand=true;
+			return 0;
 		}
 		
 
