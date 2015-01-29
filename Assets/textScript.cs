@@ -118,15 +118,34 @@ public class textScript : MonoBehaviour {
 
  	string Parser(string command) {
 		//JEŚLI ZNAK ZAPYTANA TO LOSUJ JEDNĄ Z ODPOWIEDZI ELSE PONIŻSZE
+        command = command.ToLower();
 		string[] words = command.Split(new Char [] {' ', ',', '.', ':', '\t', '?', '!' }); // wyrzucić "?"
 		List<string> tempCommand = new List<string>();
 		string buildWord = "";
 		int insertAt = 0;
         int randomNr = rnd.Next(1,10);
+        bool isHow = false, isHowQuestion = false;
 		//posortować stringa
         if ( command.Contains("?") ) {
 			//if (
-            output += randomAnswers[randomNr];
+            foreach (var word in words) {
+                if (String.Equals(word,"how"))
+                    isHow = true;
+                if (isHow && String.Equals(word, "villa")) {
+                    output += "\n[robot]> Villa costs $" + villaMoney + " .";
+                    isHowQuestion = true;
+                }
+                if (isHow && String.Equals(word, "shed")) {
+                    output += "\n[robot]> Shed costs $" + shedMoney + " .";
+                    isHowQuestion = true;
+                }
+                if (isHow && String.Equals(word, "house")) {
+                    output += "\n[robot]> House costs $" + houseMoney + " .";
+                    isHowQuestion = true;
+                }
+            }
+            if (!isHowQuestion) 
+                output += randomAnswers[randomNr];
             question = true;
         }
         else {
