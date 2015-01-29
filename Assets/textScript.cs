@@ -132,15 +132,15 @@ public class textScript : MonoBehaviour {
                 if (String.Equals(word,"how"))
                     isHow = true;
                 if (isHow && String.Equals(word, "villa")) {
-                    output += "\n[robot]> Villa costs $" + villaMoney + " .";
+                    output += "\n[robot]> A villa costs $" + villaMoney + ".";
                     isHowQuestion = true;
                 }
                 if (isHow && String.Equals(word, "shed")) {
-                    output += "\n[robot]> Shed costs $" + shedMoney + " .";
+                    output += "\n[robot]> A shed costs $" + shedMoney + ".";
                     isHowQuestion = true;
                 }
                 if (isHow && String.Equals(word, "house")) {
-                    output += "\n[robot]> House costs $" + houseMoney + " .";
+                    output += "\n[robot]> A house costs $" + houseMoney + ".";
                     isHowQuestion = true;
                 }
             }
@@ -293,7 +293,7 @@ public class textScript : MonoBehaviour {
 		}
 		//jesli nie ma go brzy banku
 		else
-			output += "\n[robot]> You have to go to the bank.";
+			output += "\n[robot]> I have to go to the bank.";
 		commandList.RemoveRange (0, commandList.Count);
 	}
 
@@ -313,7 +313,7 @@ public class textScript : MonoBehaviour {
 				rigidbody2D.transform.position += new Vector3 (0, i, 0); /* Time.deltaTime*/   
 			} else {
 				//Debug.Log("przesszkoda!");
-				output += "\n[robot]> You can't go in this direction. The " + (hitColliderName ("north")) + " is there.";
+				output += "\n[robot]> I can't go in this direction. The " + (hitColliderName ("north")) + " is there.";
 				//NIE SPRAWDZA GDZIE MOZE ISC, nie PYTA gdzie moze
 			}
 			isDirection=1;
@@ -326,7 +326,7 @@ public class textScript : MonoBehaviour {
 			if (hitCollider ("south") == false) {
 					rigidbody2D.transform.position += new Vector3 (0, -i, 0);
 			} else {
-					output += "\n[robot]> You can't go in this direction. The " + hitColliderName ("south") + " is there.";
+					output += "\n[robot]> I can't go in this direction. The " + hitColliderName ("south") + " is there.";
 			}
 			isDirection=1;
 			commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
@@ -337,7 +337,7 @@ public class textScript : MonoBehaviour {
 					//Debug.Log("czysto");
 					rigidbody2D.transform.position += new Vector3 (i, 0, 0);
 			} else {
-					output += "\n[robot]> You can't go in this direction. The " + hitColliderName ("east") + " is there.";
+					output += "\n[robot]> I can't go in this direction. The " + hitColliderName ("east") + " is there.";
 			}
 			isDirection=1;
 			commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
@@ -348,7 +348,7 @@ public class textScript : MonoBehaviour {
 			if (hitCollider ("west") == false) {
 					rigidbody2D.transform.position += new Vector3 (-i, 0, 0);
 			} else {
-					output += "\n[robot]> You can't go in this direction. The " + hitColliderName ("west") + " is there.";
+					output += "\n[robot]> I can't go in this direction. The " + hitColliderName ("west") + " is there.";
 			}
 			isDirection=1;
 			commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
@@ -369,7 +369,7 @@ public class textScript : MonoBehaviour {
 
 	void offerHouse(){
 		if (DisplayMoneyInstantion.money < shedMoney) {//nie ma na nic pieniedzy
-			output += "\nIn fact, you don't have money for any construction. You have to go to the bank and withdraw the money.";
+			output += "\nIn fact, you don't have money for any construction. I have to go to the bank and withdraw the money for you.";
 			if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
 				commandList.RemoveRange(0, 3);
 			else
@@ -377,12 +377,12 @@ public class textScript : MonoBehaviour {
 		}
 		else {
 			if (DisplayMoneyInstantion.money >= villaMoney)
-					output += "You can build a villa, a house or a shed there.";
+					output += "I can build a villa, a house or a shed there.";
 
 			else if (DisplayMoneyInstantion.money >= houseMoney)
-					output += "\nYou can build a house or a shed.";
+					output += "\nI can build a house or a shed.";
 			else
-					output += "\nYou can build only a shed.";
+					output += "\nI can build only a shed.";
 
 			output += "\nIf you want to build a construction I offered - name it. If you don't just say 'no'";
 
@@ -416,7 +416,7 @@ public class textScript : MonoBehaviour {
 			if (String.Equals (hitColliderName (commandList [1]), "grass")) 
 				construct ();
 			else if (!(hitCollider (commandList [1]))) {
-				output += "\n[robot]> You mustn't build on the road!";
+				output += "\n[robot]> I mustn't build on the road!";
 				if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
 					commandList.RemoveRange(0, 3);
 				else
@@ -424,9 +424,9 @@ public class textScript : MonoBehaviour {
 			}
 			else {//podal zly kierunek - tam cos jest
 				if (containsNietBud (hitColliderName(commandList[1])) )
-					output += "\n[robot]> You mustn't destroy city's property!";
+					output += "\n[robot]> I mustn't destroy city's property!";
 				else
-					output += "\n[robot]> First you have to get rid of " + hitColliderName (commandList [1]) + ".";
+					output += "\n[robot]> First I have to get rid of " + hitColliderName (commandList [1]) + ".";
  
 				offerDirections ();
 
@@ -464,14 +464,14 @@ public class textScript : MonoBehaviour {
 
 
 		if ( String.Equals(N,"") && String.Equals(E,"") && String.Equals(W,"") && String.Equals(S,"") ) { //nigdzie nie ma trawy
-			output += "\n[robot]> There is no ground you can build on. you have to either move or clear the area.";
+			output += "\n[robot]> There is no ground I can build on. I have to either move or clear the area.";
 			if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
 				commandList.RemoveRange(0, 3);
 			else
 				commandList.RemoveRange(0, 2);
 		}
 		else {//gdzies jest trawa
-			output += "\nIf you want you can build in the "+N+" "+S+" "+E+" "+W+"\nIf so choose a direction, if not just say 'no'.";
+			output += "\nIf you want I can build in the "+N+" "+S+" "+E+" "+W+"\nIf so choose a direction, if not just say 'no'.";
 			specialCommand=true;//z kierunkiem
 			directions=true;
 
