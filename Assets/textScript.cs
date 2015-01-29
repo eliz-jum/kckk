@@ -39,22 +39,22 @@ public class textScript : MonoBehaviour {
         directions = false;
 		if (String.Equals(commandLog, "pusta"))
         {
-			//Debug.Log("jestem w pusta");
-            if (question == false) {
-				//Debug.Log("jestem questions false");
+			Debug.Log("jestem w pusta");
+            if ( question == false ) {
+				Debug.Log("jestem questions false");
                 if (!no)
                     output += "\n[robot]> I don't understand you.";
                 else {
                     output += "\n[robot]> Ok.";
                     no = false;
                 }
-                question = true;
             }
 		} 
 		else
         { 
-          no = false;
-          fork();
+			question=false;
+         	no = false;
+         	fork();
         }
 		//output += commandText + "Robot:" + roboText; 
 	}
@@ -138,15 +138,15 @@ public class textScript : MonoBehaviour {
                     if (String.Equals(word,"how"))
                         isHow = true;
                     if (isHow && String.Equals(word, "villa")) {
-                        output += "\n[robot]> Villa costs $" + villaMoney + ".";
+                        output += "\n[robot]> A villa costs $" + villaMoney + ".";
                         isHowQuestion = true;
                     }
                     if (isHow && String.Equals(word, "shed")) {
-                        output += "\n[robot]> Shed costs $" + shedMoney + ".";
+                        output += "\n[robot]> A shed costs $" + shedMoney + ".";
                         isHowQuestion = true;
                     }
                     if (isHow && String.Equals(word, "house")) {
-                        output += "\n[robot]> House costs $" + houseMoney + ".";
+                        output += "\n[robot]> A house costs $" + houseMoney + ".";
                         isHowQuestion = true;
                     }
                 }
@@ -159,7 +159,7 @@ public class textScript : MonoBehaviour {
         			//if  exists word < processState break i powiedz jestem w trakcie wykonywania polecenia nie mogę zbudować/ zburzyć 
         			//robot powtarza jeszcze raz czego potrzebuje
                     if (String.Equals(word,"hi") || String.Equals(word,"hello")) 
-                        output += "\n[robot]> You are welcome!";
+                        output += "\n[robot]> Greetings my friend!";
         			if (commands.ContainsValue(commands[word])) {
         				if (String.Equals(commands[word],1) ) {
         					buildWord = word;
@@ -182,6 +182,7 @@ public class textScript : MonoBehaviour {
 
                         //odpowiedź użytkownika na zadanie pytania 
                         if (specialCommand) {
+							Debug.Log("jestem w specialcommand - parser");
                             //sprawdza czy podal kierunek do funkcji destroy
                             if ( (String.Equals(commandList[0],"destroy") || (String.Equals(commandList[0],"clear"))) && containsDirection(word))
                                 commandList.Insert(1,word); // wciska kierunek na commanList[1]
@@ -205,7 +206,7 @@ public class textScript : MonoBehaviour {
                             }
     						//go kierunek
     						if (String.Equals(commandList[0],"go") && (containsDirectionGo(word)) ) {	
-    							//Debug.Log("wstawiam kierunek do go");
+    							Debug.Log("wstawiam kierunek do go");
     							commandList.Insert(1,word);
 
     						}
@@ -217,7 +218,7 @@ public class textScript : MonoBehaviour {
    		if (no) {
 			//Debug.Log("jestem w no");
 			//do go
-			if (commandList.Count>1 && String.Equals(commandList[0], "go") ){
+			if (commandList.Count>0 && String.Equals(commandList[0], "go") ){
 				if (commandList.Count>1)
 					commandList.RemoveRange(0,2);
 				else
@@ -234,6 +235,8 @@ public class textScript : MonoBehaviour {
 					commandList.RemoveRange(0, 1);
 				}
 			}
+			//Debug.Log(commandList.Count);
+			//Debug.Log(specialCommand);
 		}
                 
       
@@ -473,10 +476,12 @@ public class textScript : MonoBehaviour {
 
 		if ( String.Equals(N,"") && String.Equals(E,"") && String.Equals(W,"") && String.Equals(S,"") ) { //nigdzie nie ma trawy
 			output += "\n[robot]> There is no ground I can build on. I have to either move or clear the area.";
-			if (containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
+			if ( commandList.Count>1 && containsDirection(commandList[1]) && commandList.Count>2 && containsBuilding(commandList[2]))
 				commandList.RemoveRange(0, 3);
-			else
+			else if ( commandList.Count>0 )
 				commandList.RemoveRange(0, 2);
+			else
+				commandList.RemoveRange(0, 1);
 		}
 		else {//gdzies jest trawa
 			output += "\nIf you want I can build in the "+N+" "+S+" "+E+" "+W+"\nIf so choose a direction, if not just say 'no'.";
@@ -567,6 +572,11 @@ public class textScript : MonoBehaviour {
 		if (String.Equals(slowo, "east"))
 			return true;
 		if (String.Equals(slowo, "west"))
+			return true;
+		return false;
+	}
+	bool containsTree(string slowo) {
+		if ( (String.Equals(slowo, "tree")) || (String.Equals(slowo, "tree(Clone)")) )
 			return true;
 		return false;
 	}
@@ -688,15 +698,17 @@ public class textScript : MonoBehaviour {
 						if (String.Equals (commandList [1], "east"))
 								x = i;	
 						//Debug.Log(commandList.Count);
-						if (commandList.Count > 2 && ((containsBuilding (commandList [2])) || (String.Equals (commandList [2], "tree")))) { //jesli podal budynek lub drzewo
-								if ((containsBuilding (hitColliderName (commandList [1]))) || (String.Equals (hitColliderName (commandList [1]), "tree"))) {//czy w kierunku ktory podal jest budynek/drzewo ktory podal
+						if (commandList.Count > 2 && ((containsBuilding (commandList [2])) || containsTree(commandList [2]))) { //jesli podal budynek lub drzewo
+
+							if (  ( containsBuilding(commandList[2]) && ( String.Equals( commandList[2], hitColliderName (commandList [1])) ) )
+				   				 || ( containsTree(commandList[2]) && (containsTree (hitColliderName (commandList [1]))) ) ) {//czy w kierunku ktory podal jest budynek/drzewo ktory podal
 
 										matchRemains (commandList [2], commandList [1]);
 										commandList.RemoveRange (0, 3); //USUN jedną KOMENDĘ
 										return 0;
 								} else { //w tym kierunku jest cos innego
 										// np na gorze jest home a on pisze "Destroy shed in the north."
-										output += "\n[robot]> I can't destroy the " + commandList [2]; //You can't destroy a shed
+										output += "\n[robot]> I can't destroy the " + commandList [2]+"."; //You can't destroy a shed
 										output += "\nIn the " + commandList [1] + " there is/are the " + hitColliderName (commandList [1]); //in the north there is a home.
 										if (!hitCollider (commandList [1]))
 												output += "road.";
@@ -711,12 +723,12 @@ public class textScript : MonoBehaviour {
     				 
 								//hitColliderName dostaje kierunek zwraca nazwe collidera
 								//containsRemains porownuje slowo dostane z ruins/ashes/trunks
-								if (containsRemains (hitColliderName (commandList [1]))) {//czy w kierunku ktory podal jest pozostalosc ktora podal
+								if ( String.Equals ( hitColliderName (commandList [1]), commandList[2]) ) {//czy w kierunku ktory podal jest pozostalosc ktora podal
 										destroyPrefab (commandList [1]);
 										commandList.RemoveRange (0, 3); //USUN jedną KOMENDĘ
 										return 0;
 								} else {
-										output += "\n[robot]> I can't clear " + commandList [2]; 
+										output += "\n[robot]> I can't clear " + commandList [2]+"."; 
 										output += "\n[robot]> In the " + commandList [1] + " there is the " + hitColliderName (commandList [1]);
 										if (!hitCollider (commandList [1]))
 												output += "road.";
