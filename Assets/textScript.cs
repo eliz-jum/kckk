@@ -126,85 +126,92 @@ public class textScript : MonoBehaviour {
         int randomNr = rnd.Next(1,10);
         bool isHow = false, isHowQuestion = false;
 		//posortować stringa
-        if ( command.Contains("?") ) {
-			//if (
-            foreach (var word in words) {
-                if (String.Equals(word,"how"))
-                    isHow = true;
-                if (isHow && String.Equals(word, "villa")) {
-                    output += "\n[robot]> Villa costs $" + villaMoney + " .";
-                    isHowQuestion = true;
-                }
-                if (isHow && String.Equals(word, "shed")) {
-                    output += "\n[robot]> Shed costs $" + shedMoney + " .";
-                    isHowQuestion = true;
-                }
-                if (isHow && String.Equals(word, "house")) {
-                    output += "\n[robot]> House costs $" + houseMoney + " .";
-                    isHowQuestion = true;
-                }
-            }
-            if (!isHowQuestion) 
-                output += randomAnswers[randomNr];
+        if (command.Contains("don't") || command.Contains("do not") || command.Contains("dont")) {
+            output += "\n[robot]> No problem.";
             question = true;
         }
         else {
-    		foreach (var word in words) {
-    			//if  exists word < processState break i powiedz jestem w trakcie wykonywania polecenia nie mogę zbudować/ zburzyć 
-    			//robot powtarza jeszcze raz czego potrzebuje
-                
-    			if (commands.ContainsValue(commands[word])) {
-    				if (String.Equals(commands[word],1) ) {
-    					buildWord = word;
-    					tempCommand.Add (word);
-    				}
-    				if (String.Equals(commands[word],2) ) {
-    					//if (!(String.Equals(tempCommand[tempCommand.Count - 1], buildWord))) //sprawdzić czy tempCommand.Count - 1 > 0
-    					//	tempCommand.Add (buildWord); // jeśli ostatnie słowo nie jest buildWord to dodaje buildWord przed word
-    					tempCommand.Add (word);
-    				}
-    				if (String.Equals(commands[word],3))  {
-    					tempCommand.Add (word);
-    				}
-    				if (String.Equals(word,"no"))  {
-    					no = true;
-    				}
-			//		if (String.Equals(word,"don't") || String.Equals(word,"Don't") )  {
-						
-			//		}
-
-                    //odpowiedź użytkownika na zadanie pytania 
-                    if (specialCommand) {
-                        //sprawdza czy podal kierunek do funkcji destroy
-                        if ( (String.Equals(commandList[0],"destroy") || (String.Equals(commandList[0],"clear"))) && containsDirection(word))
-                            commandList.Insert(1,word); // wciska kierunek na commanList[1]
+            if ( command.Contains("?") ) {
+    			//if (
+                foreach (var word in words) {
+                    if (String.Equals(word,"how"))
+                        isHow = true;
+                    if (isHow && String.Equals(word, "villa")) {
+                        output += "\n[robot]> Villa costs $" + villaMoney + ".";
+                        isHowQuestion = true;
+                    }
+                    if (isHow && String.Equals(word, "shed")) {
+                        output += "\n[robot]> Shed costs $" + shedMoney + ".";
+                        isHowQuestion = true;
+                    }
+                    if (isHow && String.Equals(word, "house")) {
+                        output += "\n[robot]> House costs $" + houseMoney + ".";
+                        isHowQuestion = true;
+                    }
+                }
+                if (!isHowQuestion) 
+                    output += randomAnswers[randomNr];
+                question = true;
+            }
+            else {
+        		foreach (var word in words) {
+        			//if  exists word < processState break i powiedz jestem w trakcie wykonywania polecenia nie mogę zbudować/ zburzyć 
+        			//robot powtarza jeszcze raz czego potrzebuje
+                    if (String.Equals(word,"hi") || String.Equals(word,"hello")) 
+                        output += "\n[robot]> You are welcome!";
+        			if (commands.ContainsValue(commands[word])) {
+        				if (String.Equals(commands[word],1) ) {
+        					buildWord = word;
+        					tempCommand.Add (word);
+        				}
+        				if (String.Equals(commands[word],2) ) {
+        					//if (!(String.Equals(tempCommand[tempCommand.Count - 1], buildWord))) //sprawdzić czy tempCommand.Count - 1 > 0
+        					//	tempCommand.Add (buildWord); // jeśli ostatnie słowo nie jest buildWord to dodaje buildWord przed word
+        					tempCommand.Add (word);
+        				}
+        				if (String.Equals(commands[word],3))  {
+        					tempCommand.Add (word);
+        				}
+        				if (String.Equals(word,"no"))  {
+        					no = true;
+        				}
+    			//		if (String.Equals(word,"don't") || String.Equals(word,"Don't") )  {
     						
-                        
+    			//		}
 
-						//build kierunek
-    					if (String.Equals(commandList[0],"build") && (directions) && (containsDirection(word)) ) {
-    						if ( commandList.Count > 1 && containsDirection(commandList[1]) )//jesli byl tam stary kierunek
-    							commandList[1]=word;
-    						else
-    							commandList.Insert(1,word); //wsadz kierunek na commandList[1]
-    					}
-    					//build budynek
-    					if (String.Equals(commandList[0],"build") && (constructions) && (containsBuilding(word)) ) {	
-    						if ( commandList.Count>2 && containsBuilding(commandList[2]) )//jesli byl tam stary budynek
-    							commandList[2] = word;
-    						else {
-    							commandList.Insert(2,word); //wsadz budynek na commandList[2]
+                        //odpowiedź użytkownika na zadanie pytania 
+                        if (specialCommand) {
+                            //sprawdza czy podal kierunek do funkcji destroy
+                            if ( (String.Equals(commandList[0],"destroy") || (String.Equals(commandList[0],"clear"))) && containsDirection(word))
+                                commandList.Insert(1,word); // wciska kierunek na commanList[1]
+        						
+                            
+
+    						//build kierunek
+        					if (String.Equals(commandList[0],"build") && (directions) && (containsDirection(word)) ) {
+        						if ( commandList.Count > 1 && containsDirection(commandList[1]) )//jesli byl tam stary kierunek
+        							commandList[1]=word;
+        						else
+        							commandList.Insert(1,word); //wsadz kierunek na commandList[1]
+        					}
+        					//build budynek
+        					if (String.Equals(commandList[0],"build") && (constructions) && (containsBuilding(word)) ) {	
+        						if ( commandList.Count>2 && containsBuilding(commandList[2]) )//jesli byl tam stary budynek
+        							commandList[2] = word;
+        						else {
+        							commandList.Insert(2,word); //wsadz budynek na commandList[2]
+        						}
+                            }
+    						//go kierunek
+    						if (String.Equals(commandList[0],"go") && (containsDirectionGo(word)) ) {	
+    							//Debug.Log("wstawiam kierunek do go");
+    							commandList.Insert(1,word);
+
     						}
                         }
-						//go kierunek
-						if (String.Equals(commandList[0],"go") && (containsDirectionGo(word)) ) {	
-							//Debug.Log("wstawiam kierunek do go");
-							commandList.Insert(1,word);
-
-						}
-                    }
-    			}
-    		}
+        			}
+        		}
+            }
         }
    		if (no) {
 			//Debug.Log("jestem w no");
