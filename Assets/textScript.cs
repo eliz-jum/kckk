@@ -29,19 +29,13 @@ public class textScript : MonoBehaviour {
 
 	void OnSubmit(string line) {
 		string commandLog;
-		//Debug.Log ("OnSubmit("+line+")");
-		commandText = DateTime.Now.ToString("h:mm:ss tt") +  "\nUzytkownik: \n "+ line;
-		//		roboText = Parser (line);
 		output += "\n[user]> "+line;
 		commandLog = Parser (line);
         specialCommand = false;
         constructions = false;
         directions = false;
-		if (String.Equals(commandLog, "pusta"))
-        {
-			Debug.Log("jestem w pusta");
+		if (String.Equals(commandLog, "pusta")) {
             if ( question == false ) {
-				Debug.Log("jestem questions false");
                 if (!no)
                     output += "\n[robot]> I don't understand you.";
                 else {
@@ -111,10 +105,6 @@ public class textScript : MonoBehaviour {
     void Start () {
         DisplayMoneyInstantion = (DisplayMoney)obj.GetComponent (typeof(DisplayMoney));
 		output = "[robot]> What do you want me to do?";
-      //Debug.Log(DisplayMoneyInstantion.money);
-      //objCash = GetComponent<Text> ();
-      //Debug.Log (textScriptInstantion.output);
-      //txtx.text = textScriptInstantion.output;
     }
 
  	string Parser(string command) {
@@ -184,8 +174,6 @@ public class textScript : MonoBehaviour {
 
                         //odpowiedź użytkownika na zadanie pytania 
                         if (specialCommand) {
-							Debug.Log("jestem w specialcommand - parser");
-                            //sprawdza czy podal kierunek do funkcji destroy
                             if ( (String.Equals(commandList[0],"destroy") || (String.Equals(commandList[0],"clear"))) && containsDirection(word))
                                 commandList.Insert(1,word); // wciska kierunek na commanList[1]
         						
@@ -208,7 +196,6 @@ public class textScript : MonoBehaviour {
                             }
     						//go kierunek
     						if (String.Equals(commandList[0],"go") && (containsDirectionGo(word)) ) {	
-    							Debug.Log("wstawiam kierunek do go");
     							commandList.Insert(1,word);
 
     						}
@@ -218,7 +205,6 @@ public class textScript : MonoBehaviour {
             }
         }
    		if (no) {
-			//Debug.Log("jestem w no");
 			//do go
 			if (commandList.Count>0 && String.Equals(commandList[0], "go") ){
 				if (commandList.Count>1)
@@ -233,15 +219,10 @@ public class textScript : MonoBehaviour {
 				else if (commandList.Count>1)
 	                commandList.RemoveRange(0, 2);
 				else{
-					//Debug.Log("uswam destroy");
 					commandList.RemoveRange(0, 1);
 				}
 			}
-			//Debug.Log(commandList.Count);
-			//Debug.Log(specialCommand);
-		}
-                
-      
+        }        
         if (!specialCommand) {
             swap(ref tempCommand);
 		    commandList.InsertRange(commandList.Count, tempCommand); // wstawia na koniec
@@ -313,19 +294,14 @@ public class textScript : MonoBehaviour {
 //------------------------------------------------------------GO---------------------------------------------
 
 	int go() {
-		//Debug.Log(commandList [0]);
-		//Debug.Log(commandList [1]);
-		//Debug.Log(commandList [2]);
 		// jeśli podał kierunek
 		int isDirection = 0;
 		//jesli podal kierunek
 
 		if (commandList.Count > 1 && String.Equals (commandList [1], "up")) {
 			if (hitCollider ("north") == false) {//jesli nic nie stoi na przeszkodzie
-				//Debug.Log("czysto");
 				rigidbody2D.transform.position += new Vector3 (0, i, 0); /* Time.deltaTime*/   
 			} else {
-				//Debug.Log("przesszkoda!");
 				output += "\n[robot]> I can't go in this direction. The " + (hitColliderName ("north")) + " is there.";
 				//NIE SPRAWDZA GDZIE MOZE ISC, nie PYTA gdzie moze
 			}
@@ -346,7 +322,6 @@ public class textScript : MonoBehaviour {
 		}
 		if (commandList.Count > 1 && String.Equals (commandList [1], "right")) {
 			if (hitCollider ("east") == false) {
-					//Debug.Log("czysto");
 					rigidbody2D.transform.position += new Vector3 (i, 0, 0);
 			} else {
 					output += "\n[robot]> I can't go in this direction. The " + hitColliderName ("east") + " is there.";
@@ -414,7 +389,6 @@ public class textScript : MonoBehaviour {
         x = 0;
         y = 0;
 		if (commandList.Count > 1 && containsDirection (commandList [1])) {   //jesli podal kierunek
-			Debug.Log(hitColliderName(commandList[1]));
 			if (String.Equals (commandList[1], "north"))
 					y = i;
 			if (String.Equals (commandList[1], "south"))
@@ -644,11 +618,10 @@ public class textScript : MonoBehaviour {
 		Vector2 vector = translateDirection(direction); 
 		RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, i, myLayerMask);
 		if (hit.collider != null) {
-			//Debug.Log (hitColliderName(direction));
 			return true;
 		}
 		else {
-			//Debug.Log ("W nic nie trafiłem ");
+
 			return false;
 		}
 	}
@@ -658,8 +631,6 @@ public class textScript : MonoBehaviour {
 		RaycastHit2D hit = Physics2D.Raycast (transform.position, vector, myLayerMask);	
 		if (hit.collider != null) 
             Destroy(hit.transform.gameObject);
-        //else
-            //Debug.Log ("raycast nie trafił, object = null");
 	}
 
 	void addPrefab(float x, float y, string prefab_name){
@@ -698,7 +669,6 @@ public class textScript : MonoBehaviour {
 								x = -i;
 						if (String.Equals (commandList [1], "east"))
 								x = i;	
-						//Debug.Log(commandList.Count);
 						if (commandList.Count > 2 && ((containsBuilding (commandList [2])) || containsTree(commandList [2]))) { //jesli podal budynek lub drzewo
 
 							if (  ( containsBuilding(commandList[2]) && ( String.Equals( commandList[2], hitColliderName (commandList [1])) ) )
