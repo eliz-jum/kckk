@@ -59,8 +59,6 @@ public class textScript : MonoBehaviour {
 		//output += commandText + "Robot:" + roboText; 
 	}
 	void Awake () { 
-		userInput = GameObject.Find ("userInput").GetComponent<InputField>();
-		userInput.onEndEdit.AddListener (((value) => OnSubmit(value)));
 		//userInput.validation = InputField.Validation.Alphanumeric;	
 		//tworzenie tablicy komend
 		commands.Add("build",1);//drugi argument w nawiasie to będzie np. jakiś wskaźnik na funkcje
@@ -103,7 +101,9 @@ public class textScript : MonoBehaviour {
 		randomAnswers[6] = "\n[robot]> Do not ask me SUCH questions!";
 		randomAnswers[7] = "\n[robot]> I forgot.";
 		randomAnswers[8] = "\n[robot]> If I charged you $1 for each question, would you still be asking?";
-		randomAnswers[9] = "\n[robot]> 42";
+    	randomAnswers[9] = "\n[robot]> 42";
+        userInput = GameObject.Find ("userInput").GetComponent<InputField>();
+        userInput.onEndEdit.AddListener (((value) => OnSubmit(value)));
 	}
 
    
@@ -285,7 +285,7 @@ public class textScript : MonoBehaviour {
 			destroy();
   		}
 		else {
-			output = "\n[robot}> I don't understand you. Can you rephrase?";
+			output += "\n[robot}> I don't understand you. Can you rephrase?";
 			commandList.RemoveRange(0, commandList.Count);
 		}
 		if ( !specialCommand && commandList.Count > 0 )
