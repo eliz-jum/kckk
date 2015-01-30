@@ -95,7 +95,7 @@ public class textScript : MonoBehaviour {
 		randomAnswers[6] = "\n[robot]> Do not ask me SUCH questions!";
 		randomAnswers[7] = "\n[robot]> I forgot.";
 		randomAnswers[8] = "\n[robot]> If I charged you $1 for each question, would you still be asking?";
-    	randomAnswers[9] = "\n[robot]> 42";
+    	randomAnswers[9] = "\n[robot]> You're not worthy enough to know this.";
         userInput = GameObject.Find ("userInput").GetComponent<InputField>();
         userInput.onEndEdit.AddListener (((value) => OnSubmit(value)));
 	}
