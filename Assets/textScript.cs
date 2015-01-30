@@ -158,8 +158,10 @@ public class textScript : MonoBehaviour {
         		foreach (var word in words) {
         			//if  exists word < processState break i powiedz jestem w trakcie wykonywania polecenia nie mogę zbudować/ zburzyć 
         			//robot powtarza jeszcze raz czego potrzebuje
-                    if (String.Equals(word,"hi") || String.Equals(word,"hello")) 
+                    if (String.Equals(word,"hi") || String.Equals(word,"hello")) {
                         output += "\n[robot]> Greetings my friend!";
+                        question = true;
+                    }
         			if (commands.ContainsValue(commands[word])) {
         				if (String.Equals(commands[word],1) ) {
         					buildWord = word;
@@ -331,7 +333,6 @@ public class textScript : MonoBehaviour {
 			commandList.RemoveRange (0, 2); //USUN jedną KOMENDĘ
 			return 0;
 		}
-
 
 		if (commandList.Count > 1 && String.Equals (commandList [1], "down")) {
 			if (hitCollider ("south") == false) {
